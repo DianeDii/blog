@@ -5,7 +5,7 @@ spring:
     password: dgy990416
     driver-class-name: com.mysql.cj.jdbc.Driver
   resources:
-    static-locations=classpath: /static/,classpath:/view/,classpath:/public,classpath:/resources,classpath:/META-INF/
+    static-locations: classpath:/static/,classpath:/view/,classpath:/public,classpath:/resources,classpath:/META-INF/
 
 server:
   port: 8080
