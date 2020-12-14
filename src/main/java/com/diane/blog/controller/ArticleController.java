@@ -40,6 +40,7 @@ public class ArticleController {
 //        解析data并插入article，初始化文章
 //        json数据传入顺序应与数据库表字段顺序相同
         JSONObject newArticle = JSONObject.parseObject(data);
+        articleInfo.setId(0L);
         articleInfo.setTitle(newArticle.get("title").toString());
         articleInfo.setCreateBy(new Date());
         articleInfo.setIsTop(false);
@@ -52,7 +53,6 @@ public class ArticleController {
         articleContent.setCreateBy(new Date());
         articleContent.setModifieldBy(new Date());
 
-        articleService.submitArticle(articleInfo,articleContent);
         if (articleService.submitArticle(articleInfo,articleContent) == 2){
             return  ApiResponse.success(null);
         }else {

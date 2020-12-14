@@ -4,6 +4,7 @@ import com.diane.blog.model.TblArticleInfo;
 import com.diane.blog.model.TblArticleInfoExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 public interface TblArticleInfoMapper {
     /**
@@ -93,4 +94,8 @@ public interface TblArticleInfoMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(TblArticleInfo record);
+
+//    查询Info表中最后一条数据
+    @Select("SELECT MAX(id) FROM tbl_article_info; ")
+    Long selectLast();
 }

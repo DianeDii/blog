@@ -40,12 +40,19 @@ public class ArticleServiceImpl implements ArticleService {
     TblArticleInfoExample infoExample;
     @Override
     public int submitArticle(TblArticleInfo articleInfo, TblArticleContent articleContent) {
-        articleInfoMapper.insertSelective(articleInfo);
-        articleContentMapper.insertSelective(articleContent);
-        int count = articleInfoMapper.insertSelective(articleInfo) + articleContentMapper.insertSelective(articleContent);
-        return count;//受影响行数 count = 2为正常
-//        这不严谨，应该跟del那样处理
-    }
+        int a = articleInfoMapper.insertSelective(articleInfo);
+        articleContent.setId(0L);
+//        查询插入的最后一条articleInfo的id
+//        Example还是有很大缺陷啊，没封装函数，很多sql就写不出来。
+//        在TblArticleInfoMapper中写了查询
+        articleContent.setArticleId(articleInfoMapper.selectLast());
+        int b = articleContentMapper.insertSelective(articleContent);
+
+        if (a == 1 && b ==1){
+            return a + b;
+        }else {
+            return a;
+        }    }
 
     @Override
     public int delArticle(Long artId) {
