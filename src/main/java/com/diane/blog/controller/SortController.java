@@ -41,7 +41,7 @@ public class SortController {
         }
     }
 //还可以根据name删，看情况加
-    @GetMapping("/del")
+    @DeleteMapping("/del")
     public ApiResponse delSort(@RequestParam("sortId") Long sortId) {
         if (sortService.delSort(sortId) == 1){
             return ApiResponse.success();
@@ -57,6 +57,26 @@ public class SortController {
             return ApiResponse.success(sortService.listSort());
         }else {
            return ApiResponse.fail("暂无分类/分类获取失败");
+        }
+    }
+
+    @PostMapping("/add")
+    public ApiResponse addArticleInSort(@RequestParam("sortId") Long sortId,@RequestParam("articleId") Long articleId){
+        if (sortService.addArticleInSort(sortId,articleId) == 2){
+            return ApiResponse.success();
+        }else if (sortService.addArticleInSort(sortId,articleId) == 1){
+            return ApiResponse.fail("部分未添加");
+        }else {
+            return ApiResponse.fail("添加失败");
+        }
+    }
+
+    @DeleteMapping("/remove")
+    public ApiResponse removeArticleInSort(@RequestParam("articleId") Long articleId){
+        if (sortService.delArticleInSort(articleId) == 1){
+            return  ApiResponse.success();
+        }else {
+            return ApiResponse.fail("删除失败！");
         }
     }
 

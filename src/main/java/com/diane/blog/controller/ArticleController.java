@@ -1,12 +1,11 @@
 package com.diane.blog.controller;
 
-import com.alibaba.fastjson.JSONArray;
+
 import com.alibaba.fastjson.JSONObject;
 import com.diane.blog.model.TblArticleContent;
 import com.diane.blog.model.TblArticleInfo;
 import com.diane.blog.service.ArticleService;
 import com.diane.blog.util.ApiResponse;
-import static com.diane.blog.util.JsonUtils.fromJson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,7 +64,7 @@ public class ArticleController {
      * @param artID
      * @return
      */
-    @GetMapping("/del")
+    @DeleteMapping("/del")
     public ApiResponse deleteArticle(@RequestParam("artID") Long artID){
         int count = articleService.delArticle(artID);
         if (count == 2){
@@ -80,6 +79,7 @@ public class ArticleController {
      * @param artID
      * @return
      */
+    @CrossOrigin(origins = "*",maxAge = 3600)
     @GetMapping("/{artID}")
     public ApiResponse ArticleDetail(@PathVariable("artID") Long artID){
         if (articleService == null){
@@ -88,13 +88,32 @@ public class ArticleController {
             return ApiResponse.success(articleService.listArticleDetail(artID));
         }
     }
-
+//  解决跨域(在util包种编写了CrosFilter拦截器，全局解决，@CrossOrigin注解只能解决单方法)
+//    @CrossOrigin(origins = "*",maxAge = 3600)
     @GetMapping("/list")
     public ApiResponse ListAllArticle(){
         if (articleService.listAllArticle() != null){
             return ApiResponse.success(articleService.listAllArticle());
         }else {
             return ApiResponse.fail("无文章/查询失败！");
+        }
+    }
+
+    @GetMapping("/listbysort")
+    public  ApiResponse ListbySort(@RequestParam("sortid") Long sortid){
+        if (articleService.listAllArticleInSort(sortid) != null){
+            return ApiResponse.success(articleService.listAllArticleInSort(sortid));
+        }else {
+            return ApiResponse.fail("该分类下无文章/查询失败！");
+        }
+    }
+
+    @GetMapping("/listBlog")
+    public  ApiResponse ListBlog(){
+        if (articleService.listAllBlog() != null){
+            return ApiResponse.success(articleService.listAllBlog());
+        }else {
+            return ApiResponse.fail("该分类下无文章/查询失败！");
         }
     }
 

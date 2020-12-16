@@ -19,4 +19,11 @@ public interface SortService {
     int delSort(String categoryName);
 
     JSONArray listSort();
+
+    //    文章分类相关操作(ArticleCategory)
+//   将文章加分类
+    int addArticleInSort(Long sortid, Long articleid);
+    //    将文章移出分类
+    int delArticleInSort(Long articleid);
+
 }

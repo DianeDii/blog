@@ -28,6 +28,8 @@ public interface ArticleService {
 //    概览 标题，简介
 //    查看所有博文概览
     JSONObject listAllArticle();
-//    查看某分类下所有博文概览
-    JSONObject listSortAllArticle(Long sortID);
+    //    展示某分类所有文章
+    JSONObject listAllArticleInSort(Long sortid);
+    //    展示除随笔分类的其他文章(技术博客文章)
+    JSONObject listAllBlog();
 }
