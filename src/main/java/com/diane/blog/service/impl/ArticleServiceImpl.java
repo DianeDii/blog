@@ -93,11 +93,18 @@ public class ArticleServiceImpl implements ArticleService {
             return null;
         }
     }
-
+//BUG：第一次查询时正确的，之后的查询结果就跟第一次一样
+//    是因为第一次执行方法ioc new articleCategoryExample(),在第二次调用这个方法时，ioc就用的还是上一次的对象，没有new，
+//    就导致第二次参数变了后查到的结果跟上次一样
+//    为什么IOC没有在第二次执行方法的时候new对象呢？
+//    myBatis缓存的问题 X
     @Override
-    public JSONObject listAllArticleInSort(Long sortID) {
-        articleCategoryExample.createCriteria().andSortIdEqualTo(sortID);
-        List<TblArticleCategory> result = articleCategoryMapper.selectByExample(articleCategoryExample);
+    public JSONObject listAllArticleInSort(Long sortid) {
+        TblArticleCategoryExample articleCategoryExample = new TblArticleCategoryExample();
+//        两次查询的sql一样
+//        System.out.println("初始的Example"+articleCategoryExample);
+        articleCategoryExample.createCriteria().andSortIdEqualTo(sortid);
+        List<TblArticleCategory> result = articleCategoryMapper.selectByExample(articleCategoryExample);;
         Map<String, Long> sortmap = new HashMap<>();
         for (int i = 0; i < result.size(); i++){
             TblArticleInfo articleInfo = articleInfoMapper.selectByPrimaryKey(result.get(i).getArticleId());

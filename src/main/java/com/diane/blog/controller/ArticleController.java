@@ -99,8 +99,8 @@ public class ArticleController {
         }
     }
 
-    @GetMapping("/listbysort")
-    public  ApiResponse ListbySort(@RequestParam("sortid") Long sortid){
+    @GetMapping("/listbysort/{sortid}")
+    public  ApiResponse ListbySort(@PathVariable("sortid") Long sortid){
         if (articleService.listAllArticleInSort(sortid) != null){
             return ApiResponse.success(articleService.listAllArticleInSort(sortid));
         }else {
