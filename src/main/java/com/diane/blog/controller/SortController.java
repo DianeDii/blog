@@ -3,6 +3,8 @@ package com.diane.blog.controller;
 import com.diane.blog.model.TblCategoryInfo;
 import com.diane.blog.service.SortService;
 import com.diane.blog.util.ApiResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +15,7 @@ import java.util.Date;
  * @date 2020/12/14 13:42
  * @Destription
  */
-
+@Api(tags = "分类管理接口")
 @RequestMapping("/sort")
 @RestController
 public class SortController {
@@ -25,6 +27,7 @@ public class SortController {
     @Autowired
     TblCategoryInfo categoryInfo;
 
+    @ApiOperation("创建分类")
     @PostMapping("/create")
     public  ApiResponse addSort(@RequestParam("sortName") String sortName) {
         categoryInfo.setName(sortName);
@@ -41,6 +44,7 @@ public class SortController {
         }
     }
 //还可以根据name删，看情况加
+    @ApiOperation("删除分类")
     @DeleteMapping("/del")
     public ApiResponse delSort(@RequestParam("sortId") Long sortId) {
         if (sortService.delSort(sortId) == 1){
@@ -51,6 +55,7 @@ public class SortController {
             return ApiResponse.fail("删除多条");
         }
     }
+    @ApiOperation("展示所有分类")
     @GetMapping("list")
     public ApiResponse listSort(){
         if (sortService.listSort() != null){
@@ -60,6 +65,7 @@ public class SortController {
         }
     }
 
+    @ApiOperation("给文章添加分类")
     @PostMapping("/add")
     public ApiResponse addArticleInSort(@RequestParam("sortId") Long sortId,@RequestParam("articleId") Long articleId){
         if (sortService.addArticleInSort(sortId,articleId) == 2){
@@ -71,6 +77,7 @@ public class SortController {
         }
     }
 
+    @ApiOperation("给文章移除分类")
     @DeleteMapping("/remove")
     public ApiResponse removeArticleInSort(@RequestParam("articleId") Long articleId){
         if (sortService.delArticleInSort(articleId) == 1){

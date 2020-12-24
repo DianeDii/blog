@@ -6,6 +6,8 @@ import com.diane.blog.model.TblArticleContent;
 import com.diane.blog.model.TblArticleInfo;
 import com.diane.blog.service.ArticleService;
 import com.diane.blog.util.ApiResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +18,7 @@ import java.util.Date;
  * @date 2020/12/12 17:17
  * @Destription
  */
+@Api(tags = "文章管理接口")
 @RequestMapping("/blog")
 @RestController
 public class ArticleController {
@@ -29,7 +32,7 @@ public class ArticleController {
      * @param data {"title":1,"summary":1,"content":1）
      * @return
      */
-
+    @ApiOperation("文章初始化")
     @PostMapping("/init")
     public @ResponseBody ApiResponse createArticle(@RequestBody String data){
 
@@ -64,6 +67,7 @@ public class ArticleController {
      * @param artID
      * @return
      */
+    @ApiOperation("文章删除")
     @DeleteMapping("/del")
     public ApiResponse deleteArticle(@RequestParam("artID") Long artID){
         int count = articleService.delArticle(artID);
@@ -79,6 +83,7 @@ public class ArticleController {
      * @param artID
      * @return
      */
+    @ApiOperation("查看文章详情")
     @CrossOrigin(origins = "*",maxAge = 3600)
     @GetMapping("/{artID}")
     public ApiResponse ArticleDetail(@PathVariable("artID") Long artID){
@@ -90,6 +95,7 @@ public class ArticleController {
     }
 //  解决跨域(在util包种编写了CrosFilter拦截器，全局解决，@CrossOrigin注解只能解决单方法)
 //    @CrossOrigin(origins = "*",maxAge = 3600)
+    @ApiOperation("查看所有文章")
     @GetMapping("/list")
     public ApiResponse ListAllArticle(){
         if (articleService.listAllArticle() != null){
@@ -98,7 +104,7 @@ public class ArticleController {
             return ApiResponse.fail("无文章/查询失败！");
         }
     }
-
+    @ApiOperation("查看某分类下所有文章")
     @GetMapping("/listbysort/{sortid}")
     public  ApiResponse ListbySort(@PathVariable("sortid") Long sortid){
         if (articleService.listAllArticleInSort(sortid) != null){
@@ -107,7 +113,7 @@ public class ArticleController {
             return ApiResponse.fail("该分类下无文章/查询失败！");
         }
     }
-
+    @ApiOperation("展示除随笔分类的其他文章(技术博客文章)")
     @GetMapping("/listBlog")
     public  ApiResponse ListBlog(){
         if (articleService.listAllBlog() != null){
