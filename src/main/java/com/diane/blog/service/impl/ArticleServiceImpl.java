@@ -47,15 +47,31 @@ public class ArticleServiceImpl implements ArticleService {
 //        查询插入的最后一条articleInfo的id
 //        Example还是有很大缺陷啊，没封装函数，很多sql就写不出来。
 //        在TblArticleInfoMapper中写了查询
+        int a = articleInfoMapper.insertSelective(articleInfo);
         articleContent.setArticleId(articleInfoMapper.selectLast());
-        return articleInfoMapper.insertSelective(articleInfo) + articleContentMapper.insertSelective(articleContent);
+        int b = articleContentMapper.insertSelective(articleContent);
+
+        return  a+b ;
           }
+
+    @Override
+    public int updateArticle(TblArticleInfo articleInfo, TblArticleContent articleContent) {
+//        根据文章id查询内容表里的文章内容content
+//        System.out.println("id="+articleInfo.getId());
+        contentExample.createCriteria().andArticleIdEqualTo(articleInfo.getId());
+//      example更新：第一个参数是更新后的数据组成的对象，第二个参数是example构造的查询条件即要更新的属性。
+        infoExample.createCriteria().andIdEqualTo(articleInfo.getId());
+
+        return articleContentMapper.updateByExampleSelective(articleContent,contentExample) + articleInfoMapper.updateByExampleSelective(articleInfo,infoExample);
+    }
 
     @Override
     public int delArticle(Long artId) {
         contentExample.createCriteria().andArticleIdEqualTo(artId);
-        List<TblArticleContent> content = articleContentMapper.selectByExampleWithBLOBs(contentExample);
-        return articleInfoMapper.deleteByPrimaryKey(artId) + articleContentMapper.deleteByPrimaryKey(content.get(0).getId());
+//        List<TblArticleContent> content = articleContentMapper.selectByExampleWithBLOBs(contentExample);
+        List<TblArticleContent> content = articleContentMapper.selectByExample(contentExample);
+        int a = articleInfoMapper.deleteByPrimaryKey(artId);
+        return  a + articleContentMapper.deleteByPrimaryKey(content.get(0).getId());
 
     }
 
@@ -80,8 +96,12 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public JSONObject listAllArticle() {
-        infoExample.createCriteria();
-        List<TblArticleInfo> infoList = articleInfoMapper.selectByExample(infoExample);
+//        查询全部直接拿infoExample
+//        infoExample.createCriteria();
+//      @Autowired 不会每次拿来用都会new Bean。直接拿infoExample的话修改完刷新查询出来有问题（不全）
+
+        TblArticleInfoExample info = new TblArticleInfoExample();
+        List<TblArticleInfo> infoList = articleInfoMapper.selectByExample(info);
 //      标题，简介
         if (infoList != null) {
             Map<String, Long> map = new HashMap<>();

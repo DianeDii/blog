@@ -20,6 +20,9 @@ public interface ArticleService {
 
 //    发布博客（update init）
     int submitArticle(TblArticleInfo articleInfo, TblArticleContent articleContent);
+
+//    更新博客
+    int updateArticle(TblArticleInfo articleInfo,TblArticleContent articleContent);
 //    删除博客
     int delArticle(Long artId);
 //    详情：标题，正文，创建时间
