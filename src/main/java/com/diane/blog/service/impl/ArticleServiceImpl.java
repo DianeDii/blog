@@ -82,8 +82,9 @@ public class ArticleServiceImpl implements ArticleService {
         contentExample.createCriteria().andArticleIdEqualTo(artId);
 //      读取text类型的要用selectByExampleWithBLOBs()
         List<TblArticleContent> content = articleContentMapper.selectByExampleWithBLOBs(contentExample);
-
+        System.out.println("content"+content.size());
          if (content != null){
+             System.out.println("content"+content.size());
              List<String> list = new ArrayList<>();
              list.add(articleInfo.getTitle());
              list.add(content.get(0).getContent());

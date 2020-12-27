@@ -71,7 +71,12 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
-
+        <!-- 引入jwt 进行处理token验证-->
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>3.4.0</version>
+        </dependency>
         <!-- 引入Lombock依赖 -->
         <dependency>
             <groupId>org.projectlombok</groupId>
