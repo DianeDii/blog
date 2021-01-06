@@ -2,6 +2,7 @@ package com.diane.blog.controller;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.diane.blog.dao.TblArticleInfoMapper;
 import com.diane.blog.model.TblArticleContent;
 import com.diane.blog.model.TblArticleInfo;
 import com.diane.blog.service.ArticleService;
@@ -32,6 +33,9 @@ public class ArticleController {
     @Autowired
     TblArticleContent articleContent;
 
+    @Autowired
+    TblArticleInfoMapper articleInfoMapper;
+
     /**
      *创建博客
          * @param data {"title":1,"summary":1,"content":1）
@@ -56,12 +60,14 @@ public class ArticleController {
         articleInfo.setTraffic(0);
 
 //        文章内容应该不能是string格式的
+
         articleContent.setContent(newArticle.get("content").toString());
         articleContent.setCreateBy(new Date());
         articleContent.setModifieldBy(new Date());
 
         if (articleService.submitArticle(articleInfo,articleContent) == 2){
-            return  ApiResponse.success(null);
+//            带回一个新建文章的id
+            return  ApiResponse.success(articleInfoMapper.selectLast());
         }else {
             return ApiResponse.fail("创建文章异常");
         }
@@ -78,6 +84,8 @@ public class ArticleController {
         int count = articleService.delArticle(artID);
         if (count == 2){
             return ApiResponse.success();
+        }else if(count ==3){
+            return ApiResponse.fail("未查出文章内容");
         }else {
             return ApiResponse.fail("删除失败");
         }
@@ -124,7 +132,7 @@ public class ArticleController {
      * @return
      */
     @ApiOperation("查看文章详情")
-    @CrossOrigin(origins = "*",maxAge = 3600)
+//    @CrossOrigin(origins = "*",maxAge = 3600)
     @GetMapping("/{artID}")
     public ApiResponse ArticleDetail(@PathVariable("artID") Long artID){
         if (articleService == null){

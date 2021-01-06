@@ -28,18 +28,18 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
     TblArticleContentMapper articleContentMapper;
-
-    @Autowired
-    TblArticleContentExample contentExample;
-
-    @Autowired
-    TblArticleInfoExample infoExample;
+//
+//    @Autowired
+//    TblArticleContentExample contentExample;
+//
+//    @Autowired
+//    TblArticleInfoExample infoExample;
 
     @Autowired
     TblArticleCategoryMapper articleCategoryMapper;
-
-    @Autowired
-    TblArticleCategoryExample articleCategoryExample;
+//
+//    @Autowired
+//    TblArticleCategoryExample articleCategoryExample;
 
     @Override
     public int submitArticle(TblArticleInfo articleInfo, TblArticleContent articleContent) {
@@ -48,8 +48,10 @@ public class ArticleServiceImpl implements ArticleService {
 //        Example还是有很大缺陷啊，没封装函数，很多sql就写不出来。
 //        在TblArticleInfoMapper中写了查询
         int a = articleInfoMapper.insertSelective(articleInfo);
+
+//      写conrent写不进去
         articleContent.setArticleId(articleInfoMapper.selectLast());
-        int b = articleContentMapper.insertSelective(articleContent);
+        int b = articleContentMapper.insert(articleContent);
 
         return  a+b ;
           }
@@ -58,6 +60,8 @@ public class ArticleServiceImpl implements ArticleService {
     public int updateArticle(TblArticleInfo articleInfo, TblArticleContent articleContent) {
 //        根据文章id查询内容表里的文章内容content
 //        System.out.println("id="+articleInfo.getId());
+        TblArticleContentExample contentExample = new TblArticleContentExample();
+        TblArticleInfoExample infoExample = new TblArticleInfoExample();
         contentExample.createCriteria().andArticleIdEqualTo(articleInfo.getId());
 //      example更新：第一个参数是更新后的数据组成的对象，第二个参数是example构造的查询条件即要更新的属性。
         infoExample.createCriteria().andIdEqualTo(articleInfo.getId());
@@ -67,24 +71,29 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public int delArticle(Long artId) {
+        TblArticleContentExample contentExample = new TblArticleContentExample();
         contentExample.createCriteria().andArticleIdEqualTo(artId);
 //        List<TblArticleContent> content = articleContentMapper.selectByExampleWithBLOBs(contentExample);
         List<TblArticleContent> content = articleContentMapper.selectByExample(contentExample);
-        int a = articleInfoMapper.deleteByPrimaryKey(artId);
-        return  a + articleContentMapper.deleteByPrimaryKey(content.get(0).getId());
-
+        if (content.size() == 0){
+          return 3;
+        }else {
+            int b = articleContentMapper.deleteByPrimaryKey(content.get(0).getId());
+            int a = articleInfoMapper.deleteByPrimaryKey(artId);
+            return a + b;
+        }
     }
 
     @Override
     public JSONArray listArticleDetail(Long artId) {
+        TblArticleContentExample contentExample = new TblArticleContentExample();
         TblArticleInfo articleInfo = articleInfoMapper.selectByPrimaryKey(artId);
 //        根据文章id查询内容表里的文章内容content
         contentExample.createCriteria().andArticleIdEqualTo(artId);
 //      读取text类型的要用selectByExampleWithBLOBs()
         List<TblArticleContent> content = articleContentMapper.selectByExampleWithBLOBs(contentExample);
-        System.out.println("content"+content.size());
-         if (content != null){
-             System.out.println("content"+content.size());
+        System.out.println("content= "+content.size());
+         if (content.size()!= 0){
              List<String> list = new ArrayList<>();
              list.add(articleInfo.getTitle());
              list.add(content.get(0).getContent());
@@ -136,14 +145,22 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public JSONObject listAllBlog() {
+        TblArticleCategoryExample articleCategoryExample = new TblArticleCategoryExample();
         articleCategoryExample.createCriteria().andSortIdNotEqualTo((long) 1);//这里写 1L查不出来
         List<TblArticleCategory> result = articleCategoryMapper.selectByExample(articleCategoryExample);
         Map<String, Long> sortmap = new HashMap<>();
         for (int i = 0; i < result.size(); i++){
             TblArticleInfo articleInfo = articleInfoMapper.selectByPrimaryKey(result.get(i).getArticleId());
-            sortmap.put(articleInfo.getTitle(),articleInfo.getId());
+//            null处理
+            if(articleInfo != null) {
+                sortmap.put(articleInfo.getTitle(), articleInfo.getId());
+                }
+            }
+        if (sortmap.size() != 0) {
+            return mapToJSONObject(sortmap);
+        }else {
+            return null;
         }
-        return mapToJSONObject(sortmap);
     }
 
 }
