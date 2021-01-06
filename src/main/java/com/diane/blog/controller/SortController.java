@@ -1,5 +1,6 @@
 package com.diane.blog.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.diane.blog.model.TblCategoryInfo;
 import com.diane.blog.service.SortService;
 import com.diane.blog.util.ApiResponse;
@@ -67,10 +68,12 @@ public class SortController {
 
     @ApiOperation("给文章添加分类")
     @PostMapping("/add")
-    public ApiResponse addArticleInSort(@RequestParam("sortId") Long sortId,@RequestParam("articleId") Long articleId){
-        if (sortService.addArticleInSort(sortId,articleId) == 2){
-            return ApiResponse.success();
-        }else if (sortService.addArticleInSort(sortId,articleId) == 1){
+    public @ResponseBody ApiResponse addArticleInSort(@RequestBody String data){
+        JSONObject newArticle = JSONObject.parseObject(data);
+        System.out.println(newArticle.size());
+        if (sortService.addArticleInSort(Long.valueOf(newArticle.get("sortId").toString()),Long.valueOf(newArticle.get("articleId").toString())) == 2){
+            return ApiResponse.success("添加成功");
+        }else if (sortService.addArticleInSort((long)newArticle.get("sortId"),(long)newArticle.get("articleId")) == 1){
             return ApiResponse.fail("部分未添加");
         }else {
             return ApiResponse.fail("添加失败");
@@ -84,6 +87,19 @@ public class SortController {
             return  ApiResponse.success();
         }else {
             return ApiResponse.fail("删除失败！");
+        }
+    }
+    @ApiOperation("获取文章的分类信息")
+    @GetMapping("/{artID}")
+    public ApiResponse findArtSort(@PathVariable("artID") Long artID){
+        if (sortService.getArticleSort(artID)== -1){
+            return ApiResponse.fail("该文章不存在");
+        }else if (sortService.getArticleSort(artID)== -2){
+            return ApiResponse.fail("该文章没有分类信息");
+        }else if (sortService.getArticleSort(artID)== -3){
+            return ApiResponse.fail("该文章有多条分类信息");
+        }else {
+            return ApiResponse.success(sortService.getArticleSort(artID));
         }
     }
 

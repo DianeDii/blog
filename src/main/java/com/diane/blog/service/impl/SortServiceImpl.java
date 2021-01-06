@@ -3,6 +3,7 @@ package com.diane.blog.service.impl;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.diane.blog.dao.TblArticleCategoryMapper;
+import com.diane.blog.dao.TblArticleInfoMapper;
 import com.diane.blog.dao.TblCategoryInfoMapper;
 import com.diane.blog.model.TblArticleCategory;
 import com.diane.blog.model.TblArticleCategoryExample;
@@ -34,11 +35,12 @@ public class SortServiceImpl implements SortService {
     @Autowired
     TblArticleCategoryMapper articleCategoryMapper;
 
-    @Autowired
-    TblArticleCategoryExample articleCategoryExample;
 
     @Autowired
     TblArticleCategory articleCategory;
+
+    @Autowired
+    TblArticleInfoMapper articleInfoMapper;
 
     @Override
     public int createSort(TblCategoryInfo categoryInfo) {
@@ -88,8 +90,31 @@ public class SortServiceImpl implements SortService {
 
     @Override
     public int delArticleInSort(Long articleid) {
+
+        TblArticleCategoryExample articleCategoryExample = new TblArticleCategoryExample();
+
         articleCategoryExample.createCriteria().andArticleIdEqualTo(articleid);
         return articleCategoryMapper.deleteByExample(articleCategoryExample);
+    }
+
+    @Override
+    public Long getArticleSort(Long artId) {
+//        先边界处理，查看有没有这个id
+        if (articleInfoMapper.selectByPrimaryKey(artId) == null){
+            return -1L;//该文章不存在
+        }else {
+            TblArticleCategoryExample articleCategoryExample = new TblArticleCategoryExample();
+            articleCategoryExample.createCriteria().andArticleIdEqualTo(artId);
+                List<TblArticleCategory> articleCategories= articleCategoryMapper.selectByExample(articleCategoryExample);
+                if (articleCategories.size() ==1){
+                    return articleCategories.get(0).getSortId();
+                }else if(articleCategories.size() ==0){
+                    return -2L;//该文章无分类信息
+                }else {
+                    return -3L;//非法！该文章有多条分类信息
+                }
+//            }
+        }
     }
 
 
