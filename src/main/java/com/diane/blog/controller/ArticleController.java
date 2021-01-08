@@ -171,5 +171,15 @@ public class ArticleController {
         }
     }
 
+    @ApiOperation("全局搜索文章内容")
+    @PostMapping("/search")
+    public ApiResponse SearchArticleInGlobal(@RequestParam("keyword") String keyword){
+        if (articleService.searchArticleByKeyword(keyword) == null){
+            return ApiResponse.success("无数据");
+        }else {
+            return ApiResponse.success(articleService.searchArticleByKeyword(keyword));
+        }
+    }
+
 
 }

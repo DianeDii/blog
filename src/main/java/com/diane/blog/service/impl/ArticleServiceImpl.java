@@ -105,20 +105,27 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public JSONObject listAllArticle() {
+    public String listAllArticle() {
 //        查询全部直接拿infoExample
 //        infoExample.createCriteria();
 //      @Autowired 不会每次拿来用都会new Bean。直接拿infoExample的话修改完刷新查询出来有问题（不全）
 
         TblArticleInfoExample info = new TblArticleInfoExample();
         List<TblArticleInfo> infoList = articleInfoMapper.selectByExample(info);
-//      标题，简介
+//      标题，id
+// TODO: 2021/1/6 扩展接口，使之增加返回 ‘简介&时间’
+//        if (infoList != null) {
+//            Map<String, Long> map = new HashMap<>();
+//            for (int i = 0; i < infoList.size(); i++) {
+//                map.put(infoList.get(i).getTitle(), infoList.get(i).getId());
+//            }
+//            return mapToJSONObject(map);
+//        }else {
+//            return null;
+//        }
+//  我直接list转JSONArray
         if (infoList != null) {
-            Map<String, Long> map = new HashMap<>();
-            for (int i = 0; i < infoList.size(); i++) {
-                map.put(infoList.get(i).getTitle(), infoList.get(i).getId());
-            }
-            return mapToJSONObject(map);
+            return JSONObject.toJSONString(infoList);
         }else {
             return null;
         }
@@ -134,7 +141,7 @@ public class ArticleServiceImpl implements ArticleService {
 //        两次查询的sql一样
 //        System.out.println("初始的Example"+articleCategoryExample);
         articleCategoryExample.createCriteria().andSortIdEqualTo(sortid);
-        List<TblArticleCategory> result = articleCategoryMapper.selectByExample(articleCategoryExample);;
+        List<TblArticleCategory> result = articleCategoryMapper.selectByExample(articleCategoryExample);
         Map<String, Long> sortmap = new HashMap<>();
         for (int i = 0; i < result.size(); i++){
             TblArticleInfo articleInfo = articleInfoMapper.selectByPrimaryKey(result.get(i).getArticleId());
@@ -162,5 +169,48 @@ public class ArticleServiceImpl implements ArticleService {
             return null;
         }
     }
+
+    @Override
+    public String searchArticleByKeyword(String keyword) {
+//        要查什么，从article_info 查title，summary，   article_content   查  content
+//        先实现，再优化
+//        先查title，如果title有关键字直接返回文章概况，若没有查找summary，若匹配到继续返回文章概况，若查找content ，若无返回null
+        TblArticleInfoExample infoExample = new TblArticleInfoExample();
+        infoExample.createCriteria().andTitleLike("%"+keyword+"%");
+        if (articleInfoMapper.selectByExample(infoExample).size() == 0){
+            infoExample.clear();
+            infoExample.createCriteria().andSummaryLike("%"+keyword+"%");
+            if (articleInfoMapper.selectByExample(infoExample).size() ==0){
+
+/**1.7
+ *                 没有查超大文本的啊，索引怎么用
+ *                 使用全文索引(Fulltext)
+ *                 数据库新建索引 ： create fulltext index content_word on tbl_article_content(content);
+ *                 ---
+ *
+ *                 数据接结构（树。B树/B+树）
+ *                 想用索引->索引用了查不出数据->是不是我格式写的不对->找到是数据库配置的原因->还是查不出来->看看索引原理->B+树->树->数据结构
+ *                 我好难
+ * 1.8      已解决
+ */
+// TODO: 2021/1/8 功能实现，代码待优化
+                if (articleContentMapper.selectcontentLikeWord(keyword).size() == 0){
+                    return null;
+                }else {
+                    for (int i = 0; i < articleContentMapper.selectcontentLikeWord(keyword).size(); i++) {
+                        infoExample.clear();
+                        infoExample.createCriteria().andIdEqualTo(articleContentMapper.selectcontentLikeWord(keyword).get(i));
+                        return JSONObject.toJSONString(articleInfoMapper.selectByExample(infoExample));
+                    }
+                    return JSONObject.toJSONString(articleContentMapper.selectcontentLikeWord(keyword).size());
+                }
+            }else {
+                return JSONObject.toJSONString(articleInfoMapper.selectByExample(infoExample));
+            }
+        }else {
+            return JSONObject.toJSONString(articleInfoMapper.selectByExample(infoExample));
+        }
+    }
+
 
 }

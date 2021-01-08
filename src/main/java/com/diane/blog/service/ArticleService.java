@@ -30,9 +30,11 @@ public interface ArticleService {
     JSONArray listArticleDetail(Long artId);
 //    概览 标题，简介
 //    查看所有博文概览
-    JSONObject listAllArticle();
+    String listAllArticle();
     //    展示某分类所有文章
     JSONObject listAllArticleInSort(Long sortid);
     //    展示除随笔分类的其他文章(技术博客文章)
     JSONObject listAllBlog();
+    // TODO: 2021/1/7 模糊全局查询
+    String searchArticleByKeyword(String keyword);
 }
