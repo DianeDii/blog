@@ -27,5 +27,7 @@ public interface SortService {
     int delArticleInSort(Long articleid);
 //    获取某个文章的分类id
     Long getArticleSort(Long artId);
+//    更新文章名称
+    int updateSortName(Long sortid,String name);
 
 }

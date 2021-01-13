@@ -108,7 +108,7 @@ public class ArticleController {
 
         articleInfo.setId(Long.valueOf(newArticle.get("artid").toString()));
         articleInfo.setTitle(newArticle.get("title").toString());
-        articleInfo.setCreateBy(new Date());
+//        articleInfo.setCreateBy(new Date());
         articleInfo.setIsTop(false);
         articleInfo.setModifiedBy(new Date());
         articleInfo.setSummary(newArticle.get("summary").toString());
@@ -178,6 +178,16 @@ public class ArticleController {
             return ApiResponse.success("无数据");
         }else {
             return ApiResponse.success(articleService.searchArticleByKeyword(keyword));
+        }
+    }
+
+    @ApiOperation("展示最近五篇文章")
+    @PostMapping("/recent")
+    public  ApiResponse recentArticle(){
+        if (articleService.recentArticle() ==null){
+            return ApiResponse.success("无文章");
+        }else {
+            return ApiResponse.success(articleService.recentArticle());
         }
     }
 

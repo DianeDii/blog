@@ -65,8 +65,18 @@ public class ArticleServiceImpl implements ArticleService {
         contentExample.createCriteria().andArticleIdEqualTo(articleInfo.getId());
 //      example更新：第一个参数是更新后的数据组成的对象，第二个参数是example构造的查询条件即要更新的属性。
         infoExample.createCriteria().andIdEqualTo(articleInfo.getId());
+//     这里使用Selective数据库会报错：
+        /*
+org.springframework.dao.DuplicateKeyException:
+### Error updating database.  Cause: java.sql.SQLIntegrityConstraintViolationException: Duplicate entry '0' for key 'PRIMARY'
+### The error may involve com.diane.blog.dao.TblArticleContentMapper.updateByExampleSelective-Inline
+### The error occurred while setting parameters
+### SQL: update tbl_article_content      SET id = ?,                       article_id = ?,                       create_by = ?,                       modifield_by = ?,                       content = ?                          WHERE (  article_id = ? )
+### Cause: java.sql.SQLIntegrityConstraintViolationException: Duplicate entry '0' for key 'PRIMARY'
 
-        return articleContentMapper.updateByExampleSelective(articleContent,contentExample) + articleInfoMapper.updateByExampleSelective(articleInfo,infoExample);
+         */
+//        return articleContentMapper.updateByExampleSelective(articleContent,contentExample) + articleInfoMapper.updateByExampleSelective(articleInfo,infoExample);
+        return articleContentMapper.updateByExample(articleContent,contentExample) + articleInfoMapper.updateByExample(articleInfo,infoExample);
     }
 
     @Override
@@ -98,6 +108,7 @@ public class ArticleServiceImpl implements ArticleService {
              list.add(articleInfo.getTitle());
              list.add(content.get(0).getContent());
              list.add(articleInfo.getModifiedBy().toString());
+             list.add(articleInfo.getSummary());
              return listToJsonArray(list);
          }else {
              return null;
@@ -142,12 +153,16 @@ public class ArticleServiceImpl implements ArticleService {
 //        System.out.println("初始的Example"+articleCategoryExample);
         articleCategoryExample.createCriteria().andSortIdEqualTo(sortid);
         List<TblArticleCategory> result = articleCategoryMapper.selectByExample(articleCategoryExample);
-        Map<String, Long> sortmap = new HashMap<>();
-        for (int i = 0; i < result.size(); i++){
-            TblArticleInfo articleInfo = articleInfoMapper.selectByPrimaryKey(result.get(i).getArticleId());
-            sortmap.put(articleInfo.getTitle(),articleInfo.getId());
+        if (result.size() == 0){
+            return null;
+        }else {
+            Map<String, Long> sortmap = new HashMap<>();
+            for (int i = 0; i < result.size(); i++) {
+                TblArticleInfo articleInfo = articleInfoMapper.selectByPrimaryKey(result.get(i).getArticleId());
+                sortmap.put(articleInfo.getTitle(), articleInfo.getId());
+            }
+            return mapToJSONObject(sortmap);
         }
-        return mapToJSONObject(sortmap);
     }
 
     @Override
@@ -209,6 +224,16 @@ public class ArticleServiceImpl implements ArticleService {
             }
         }else {
             return JSONObject.toJSONString(articleInfoMapper.selectByExample(infoExample));
+        }
+    }
+
+    @Override
+    public String recentArticle() {
+        TblArticleInfoExample infoExample = new TblArticleInfoExample();
+        if (articleInfoMapper.rencentArticle().size() ==0){
+            return null;
+        }else {
+            return JSONObject.toJSONString(articleInfoMapper.rencentArticle());
         }
     }
 

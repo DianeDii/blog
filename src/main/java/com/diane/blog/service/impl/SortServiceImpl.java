@@ -29,8 +29,8 @@ public class SortServiceImpl implements SortService {
     @Autowired
     TblCategoryInfoMapper categoryInfoMapper;
 
-    @Autowired
-    TblCategoryInfoExample categoryInfoExample;
+//    @Autowired
+//    TblCategoryInfoExample categoryInfoExample;
 
     @Autowired
     TblArticleCategoryMapper articleCategoryMapper;
@@ -58,12 +58,14 @@ public class SortServiceImpl implements SortService {
 
     @Override
     public int delSort(String categoryName) {
+        TblCategoryInfoExample categoryInfoExample = new TblCategoryInfoExample();
         categoryInfoExample.createCriteria().andNameEqualTo(categoryName);
         return categoryInfoMapper.deleteByExample(categoryInfoExample);
     }
 
     @Override
     public JSONArray listSort() {
+        TblCategoryInfoExample categoryInfoExample = new TblCategoryInfoExample();
 //        is_effective是否启用字段先不用
         categoryInfoExample.createCriteria();
         List<TblCategoryInfo> allSort= categoryInfoMapper.selectByExample(categoryInfoExample);
@@ -115,6 +117,19 @@ public class SortServiceImpl implements SortService {
                 }
 //            }
         }
+    }
+
+    @Override
+    public int updateSortName(Long sortId,String name) {
+        TblCategoryInfo info = new TblCategoryInfo();
+        info.setNumber(null);
+        info.setModifiedBy(null);
+        info.setModifiedBy(new Date());
+        info.setIsEffective(null);
+        info.setId(sortId);
+        info.setName(name);
+        int a = categoryInfoMapper.updateByPrimaryKeySelective(info);
+        return a;
     }
 
 

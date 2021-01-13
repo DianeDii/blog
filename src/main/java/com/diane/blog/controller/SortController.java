@@ -102,5 +102,18 @@ public class SortController {
             return ApiResponse.success(sortService.getArticleSort(artID));
         }
     }
+    @ApiOperation("更新分类信息")
+    @PostMapping("/update")
+    public @ResponseBody ApiResponse updateSortName(@RequestBody String data){
+        JSONObject newArticle = JSONObject.parseObject(data);
+        int result = sortService.updateSortName(Long.valueOf(newArticle.get("sortId").toString()),newArticle.get("value").toString());
+        if (result == 0){
+            return ApiResponse.fail("更新分类失败");
+        }else if (result == 1){
+            return ApiResponse.success();
+        }else {
+            return ApiResponse.fail("更新出错，多行数据受影响");
+        }
+    }
 
 }

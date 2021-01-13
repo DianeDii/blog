@@ -35,6 +35,8 @@ public interface ArticleService {
     JSONObject listAllArticleInSort(Long sortid);
     //    展示除随笔分类的其他文章(技术博客文章)
     JSONObject listAllBlog();
-    // TODO: 2021/1/7 模糊全局查询
+    // TODO: 2021/1/7 模糊全局查询    1/8完成
     String searchArticleByKeyword(String keyword);
+//    获取最近时间的五篇文章
+    String recentArticle();
 }
