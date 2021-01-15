@@ -47,7 +47,8 @@ public class SortController {
 //还可以根据name删，看情况加
     @ApiOperation("删除分类")
     @DeleteMapping("/del")
-    public ApiResponse delSort(@RequestParam("sortId") Long sortId) {
+    public  ApiResponse delSort(@RequestParam("sortId") String Id) {
+        Long sortId = Long.parseLong(Id);
         if (sortService.delSort(sortId) == 1){
             return ApiResponse.success();
         }else if (sortService.delSort(sortId) == 0){
@@ -56,7 +57,7 @@ public class SortController {
             return ApiResponse.fail("删除多条");
         }
     }
-    @ApiOperation("展示所有分类")
+    @ApiOperation("展示所有分类(不含预设分类)")
     @GetMapping("list")
     public ApiResponse listSort(){
         if (sortService.listSort() != null){
@@ -106,7 +107,7 @@ public class SortController {
     @PostMapping("/update")
     public @ResponseBody ApiResponse updateSortName(@RequestBody String data){
         JSONObject newArticle = JSONObject.parseObject(data);
-        int result = sortService.updateSortName(Long.valueOf(newArticle.get("sortId").toString()),newArticle.get("value").toString());
+        int result = sortService.updateSortName(Long.valueOf(newArticle.get("sortid").toString()),newArticle.get("value").toString());
         if (result == 0){
             return ApiResponse.fail("更新分类失败");
         }else if (result == 1){

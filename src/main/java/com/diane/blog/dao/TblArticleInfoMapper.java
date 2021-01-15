@@ -100,7 +100,7 @@ public interface TblArticleInfoMapper {
 //    查询最后文章信息表最后一位id
     @Select("SELECT MAX(id) FROM tbl_article_info;")
     Long selectLast();
-//    查询最近五篇文章
-    @Select("SELECT * FROM tbl_article_info ORDER BY modified_by DESC LIMIT 0,5")
+//    查询最近五篇文章(不要sortId = 2/3的分类)
+    @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id =ac.article_id AND ac.sort_id <>2 AND ac.sort_id <>3 ORDER BY modified_by DESC LIMIT 0,5;")
     List<TblArticleInfo> rencentArticle();
 }

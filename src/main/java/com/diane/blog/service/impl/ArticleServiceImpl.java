@@ -168,7 +168,9 @@ org.springframework.dao.DuplicateKeyException:
     @Override
     public JSONObject listAllBlog() {
         TblArticleCategoryExample articleCategoryExample = new TblArticleCategoryExample();
-        articleCategoryExample.createCriteria().andSortIdNotEqualTo((long) 1);//这里写 1L查不出来
+
+        articleCategoryExample.createCriteria()    //不查预设的三个分类
+                .andSortIdGreaterThanOrEqualTo(4L);
         List<TblArticleCategory> result = articleCategoryMapper.selectByExample(articleCategoryExample);
         Map<String, Long> sortmap = new HashMap<>();
         for (int i = 0; i < result.size(); i++){
@@ -208,6 +210,7 @@ org.springframework.dao.DuplicateKeyException:
  *                 我好难
  * 1.8      已解决
  */
+
 // TODO: 2021/1/8 功能实现，代码待优化
                 if (articleContentMapper.selectcontentLikeWord(keyword).size() == 0){
                     return null;

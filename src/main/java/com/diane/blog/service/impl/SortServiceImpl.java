@@ -67,7 +67,7 @@ public class SortServiceImpl implements SortService {
     public JSONArray listSort() {
         TblCategoryInfoExample categoryInfoExample = new TblCategoryInfoExample();
 //        is_effective是否启用字段先不用
-        categoryInfoExample.createCriteria();
+        categoryInfoExample.createCriteria().andIdGreaterThanOrEqualTo(4L);
         List<TblCategoryInfo> allSort= categoryInfoMapper.selectByExample(categoryInfoExample);
         return listToJsonArray(allSort);
     }
