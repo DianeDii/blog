@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 /**
  * @author dianedi
  * @date 2020/12/12 13:55
- * @Destription
+ * @Destription 拦截器
  */
 @Slf4j
 @ControllerAdvice
@@ -17,33 +17,33 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(ServiceException.class)
     @ResponseBody
-    public ApiResponse handleServiceException(ServiceException e) {
+    public Apiresponse handleServiceException(ServiceException e) {
         log.error(e.getMessage(), e);
-        return ApiResponse.fail(e.getCode(), e.getMessage());
+        return Apiresponse.fail(e.getCode(), e.getMessage());
     }
 
     @ExceptionHandler(BindException.class)
     @ResponseBody
-    public ApiResponse handleBindException(BindException e)
+    public Apiresponse handleBindException(BindException e)
     {
         log.error(e.getMessage(), e);
         String message = e.getAllErrors().get(0).getDefaultMessage();
-        return ApiResponse.fail(message);
+        return Apiresponse.fail(message);
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseBody
-    public ApiResponse handleException(Exception e)
+    public Apiresponse handleException(Exception e)
     {
         log.error(e.getMessage(), e);
-        return ApiResponse.fail(e.getMessage());
+        return Apiresponse.fail(e.getMessage());
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseBody
-    public ApiResponse handleRuntimeException(RuntimeException e)
+    public Apiresponse handleRuntimeException(RuntimeException e)
     {
         log.error(e.getMessage(), e);
-        return ApiResponse.fail(e.getMessage());
+        return Apiresponse.fail(e.getMessage());
     }
 }

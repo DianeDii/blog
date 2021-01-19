@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Data
 @Builder
 @Slf4j
-public class ApiResponse<T> implements Serializable {
+public class Apiresponse<T> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -19,32 +19,32 @@ public class ApiResponse<T> implements Serializable {
 
 
     private T data;
-
-    public static <T> ApiResponse success(T data) {
-        ApiResponse response = ApiResponse.builder().code(ReturnCode.SUCCESS.getCode()).message(ReturnCode.SUCCESS.getMessage()).data(data).build();
+//  成功不需要响应码
+    public static <T> Apiresponse success(T data) {
+        Apiresponse response = Apiresponse.builder().code(ReturnCode.SUCCESS.getCode()).message(ReturnCode.SUCCESS.getMessage()).data(data).build();
         log.info("Success API Response: {}", response.toString());
         return response;
     }
 
-    public static ApiResponse success() {
+    public static Apiresponse success() {
         return success(null);
     }
 
-    public static <T> ApiResponse fail(int code, String message) {
-        ApiResponse response = ApiResponse.builder().code(code).message(message).build();
+    public static <T> Apiresponse fail(int code, String message) {
+        Apiresponse response = Apiresponse.builder().code(code).message(message).build();
         log.error("Failed API Response: {}", response.toString());
         return response;
     }
 
-    public static <T> ApiResponse fail(ReturnCode returnCode) {
+    public static <T> Apiresponse fail(ReturnCode returnCode) {
         return fail(returnCode.getCode(), returnCode.getMessage());
     }
 
-    public static <T> ApiResponse fail() {
+    public static <T> Apiresponse fail() {
         return fail(ReturnCode.FAILED);
     }
 
-    public static <T> ApiResponse fail(String message) {
+    public static <T> Apiresponse fail(String message) {
         return fail(ReturnCode.FAILED.getCode(), message);
     }
 }
