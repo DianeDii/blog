@@ -101,6 +101,12 @@ public interface TblArticleInfoMapper {
     @Select("SELECT MAX(id) FROM tbl_article_info;")
     Long selectLast();
 //    查询最近五篇文章(不要sortId = 2/3的分类)
-    @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id =ac.article_id AND ac.sort_id <>2 AND ac.sort_id <>3 ORDER BY modified_by DESC LIMIT 0,5;")
+    @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id =ac.article_id AND ac.sort_id <>2 AND ac.sort_id <>3 ORDER BY modified_by DESC LIMIT 0,5")
     List<TblArticleInfo> rencentArticle();
+//    查询所有文章（除预设分类下）
+    @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id =ac.article_id AND ac.sort_id <>2 AND ac.sort_id <>3")
+    List<TblArticleInfo> listArticle();
+//    查询某分类下的所有文章
+    @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id = ac.article_id AND ac.sort_id = #{sortId}")
+    List<TblArticleInfo> listArticleInSort(Long sortId);
 }
