@@ -5,11 +5,15 @@ import com.alibaba.fastjson.JSONObject;
 import com.diane.blog.dao.TblArticleCategoryMapper;
 import com.diane.blog.dao.TblArticleContentMapper;
 import com.diane.blog.dao.TblArticleInfoMapper;
+import com.diane.blog.dao.TblCategoryInfoMapper;
 import com.diane.blog.model.*;
 
 import com.diane.blog.service.ArticleService;
+import com.diane.blog.util.ReturnCode;
+import com.diane.blog.util.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -33,7 +37,20 @@ public class ArticleServiceImpl implements ArticleService {
     @Autowired
     TblArticleCategoryMapper articleCategoryMapper;
 
+    @Autowired
+    TblCategoryInfoMapper categoryInfoMapper;
 
+    /**
+     * artinfo表需要插入一条数据，同时artcontent也需要插入一条数据，这两条数据要么都插入进去，要么都没插，不能出现info中插入成功而content插入失败的情况。
+     * 用事务
+     * 1.怎么配置@Transactional
+     * 2.怎么设置回滚
+     * 3.除了查询其他地方可能都涉及回滚
+     * @param articleInfo
+     * @param articleContent
+     * @return
+     */
+    @Transactional(rollbackFor = ServiceException.class)
     @Override
     public int submitArticle(TblArticleInfo articleInfo, TblArticleContent articleContent) {
         articleContent.setId(0L);
@@ -41,14 +58,20 @@ public class ArticleServiceImpl implements ArticleService {
 //        Example还是有很大缺陷啊，没封装函数，很多sql就写不出来。
 //        在TblArticleInfoMapper中写了查询
         int a = articleInfoMapper.insertSelective(articleInfo);
-
 //      写conrent写不进去
         articleContent.setArticleId(articleInfoMapper.selectLast());
         int b = articleContentMapper.insert(articleContent);
+        if (a + b == 2){
+            return 2;
+        }else if (a + b == 1){
+//            两个表如果没有都插入就会事务回滚
+            throw new ServiceException(ReturnCode.SQL_DATA_CREATE_EXCEPTION);
+        }else {
+            return 0;
+            }
+    }
 
-        return  a+b ;
-          }
-
+    @Transactional(rollbackFor = ServiceException.class)
     @Override
     public int updateArticle(TblArticleInfo articleInfo, TblArticleContent articleContent) {
 //        根据文章id查询内容表里的文章内容content
@@ -58,32 +81,38 @@ public class ArticleServiceImpl implements ArticleService {
         contentExample.createCriteria().andArticleIdEqualTo(articleInfo.getId());
 //      example更新：第一个参数是更新后的数据组成的对象，第二个参数是example构造的查询条件即要更新的属性。
         infoExample.createCriteria().andIdEqualTo(articleInfo.getId());
-//     这里使用Selective数据库会报错：
-        /*
-org.springframework.dao.DuplicateKeyException:
-### Error updating database.  Cause: java.sql.SQLIntegrityConstraintViolationException: Duplicate entry '0' for key 'PRIMARY'
-### The error may involve com.diane.blog.dao.TblArticleContentMapper.updateByExampleSelective-Inline
-### The error occurred while setting parameters
-### SQL: update tbl_article_content      SET id = ?,                       article_id = ?,                       create_by = ?,                       modifield_by = ?,                       content = ?                          WHERE (  article_id = ? )
-### Cause: java.sql.SQLIntegrityConstraintViolationException: Duplicate entry '0' for key 'PRIMARY'
-
-         */
 //        return articleContentMapper.updateByExampleSelective(articleContent,contentExample) + articleInfoMapper.updateByExampleSelective(articleInfo,infoExample);
-        return articleContentMapper.updateByExample(articleContent,contentExample) + articleInfoMapper.updateByExample(articleInfo,infoExample);
+        int a = articleContentMapper.updateByExample(articleContent,contentExample);
+        int b = articleInfoMapper.updateByExample(articleInfo,infoExample);
+        if (a + b == 2){
+            return 2;
+        }else if (a + b == 1){
+            throw new ServiceException(ReturnCode.SQL_DATA_CREATE_EXCEPTION);
+        }else {
+            return 0;
+        }
     }
-
+// 这里需要加某分类下文章数减一的逻辑（这里有点耦合了）
+//    查询所删除文章所在分类，使分类信息表中该分类的num-1
+    @Transactional(rollbackFor = ServiceException.class)
     @Override
     public int delArticle(Long artId) {
         TblArticleContentExample contentExample = new TblArticleContentExample();
         contentExample.createCriteria().andArticleIdEqualTo(artId);
-//        List<TblArticleContent> content = articleContentMapper.selectByExampleWithBLOBs(contentExample);
         List<TblArticleContent> content = articleContentMapper.selectByExample(contentExample);
         if (content.size() == 0){
-          return 3;
+          return -1;
         }else {
+            int c = articleCategoryMapper.reducecateinfonum(artId);
             int b = articleContentMapper.deleteByPrimaryKey(content.get(0).getId());
             int a = articleInfoMapper.deleteByPrimaryKey(artId);
-            return a + b;
+            if (a + b + c == 3){
+                return 3;
+            }else if (a + b +c >0 && a + b + c <3){
+                throw new ServiceException(ReturnCode.SQL_DATA_CREATE_EXCEPTION);
+            }else {
+                return 0;
+            }
         }
     }
 
@@ -154,6 +183,8 @@ org.springframework.dao.DuplicateKeyException:
 //        要查什么，从article_info 查title，summary，   article_content   查  content
 //        先实现，再优化
 //        先查title，如果title有关键字直接返回文章概况，若没有查找summary，若匹配到继续返回文章概况，若查找content ，若无返回null
+// 1.19
+//        全文索引也可以关联多个属性，但我觉得我这样效率高些
         TblArticleInfoExample infoExample = new TblArticleInfoExample();
         infoExample.createCriteria().andTitleLike("%"+keyword+"%");
         if (articleInfoMapper.selectByExample(infoExample).size() == 0){

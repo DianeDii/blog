@@ -16,6 +16,7 @@ public interface SortService {
     int createSort(TblCategoryInfo categoryInfo);
 
     int delSort(Long id);
+//    无调用，先不管
     int delSort(String categoryName);
 
     JSONArray listSort();

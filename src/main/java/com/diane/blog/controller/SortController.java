@@ -56,6 +56,7 @@ public class SortController {
             @ApiResponse(code = 200,message = "删除成功"),
             @ApiResponse(code = 404,message = "所删除分类不存在"),
             @ApiResponse(code = 500,message = "删除分类接口出错"),
+            @ApiResponse(code = 501,message = "分类未删除完全"),
     })
     @DeleteMapping("/del")
     public Apiresponse delSort(@ApiParam("分类Id") @RequestParam("sortId") String Id) {
@@ -110,7 +111,7 @@ public class SortController {
     })
     @DeleteMapping("/remove")
     public Apiresponse removeArticleInSort(@ApiParam("文章Id") @RequestParam("articleId") Long articleId){
-        if (sortService.delArticleInSort(articleId) == 1){
+        if (sortService.delArticleInSort(articleId) == 2){
             return  Apiresponse.success(SUCCESS);
         }else {
             return Apiresponse.fail(API_EXCEPTION);

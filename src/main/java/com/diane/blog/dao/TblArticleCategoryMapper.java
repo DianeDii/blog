@@ -4,6 +4,7 @@ import com.diane.blog.model.TblArticleCategory;
 import com.diane.blog.model.TblArticleCategoryExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -95,4 +96,8 @@ public interface TblArticleCategoryMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(TblArticleCategory record);
+
+//    传入一个artId，使该文章所在目录下的文章数量-1
+    @Select("UPDATE tbl_category_info SET number = number -1 WHERE id =(SELECT ac.sort_id FROM tbl_article_category ac WHERE ac.article_id = #{artId});")
+    int reducecateinfonum(Long artId);
 }

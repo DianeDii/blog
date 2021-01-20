@@ -74,8 +74,6 @@ public class ArticleController {
         if (articleService.submitArticle(articleInfo,articleContent) == 2){
 //            带回一个新建文章的id
             return  Apiresponse.success(articleInfoMapper.selectLast());
-        }else if(articleService.submitArticle(articleInfo,articleContent) == 1){
-            return Apiresponse.fail(SQL_DATA_CREATE_EXCEPTION);
         }else {
             return Apiresponse.fail(API_EXCEPTION);
         }
@@ -91,14 +89,17 @@ public class ArticleController {
             @ApiResponse(code = 200,message = "删除成功"),
             @ApiResponse(code = 404,message = "删除文章不存在"),
             @ApiResponse(code = 500,message = "删除文章接口出错"),
+            @ApiResponse(code = 501,message = "文章未删除完全"),
     })
     @DeleteMapping("/del")
     public Apiresponse deleteArticle(@ApiParam("文章id") @RequestParam("artID") Long artID){
         int count = articleService.delArticle(artID);
-        if (count == 2){
-            return Apiresponse.success();
-        }else if(count ==3){
+        if (count == 3){
+            return Apiresponse.success(SUCCESS);
+        }else if(count == -1){
             return Apiresponse.fail(NOT_FOUND);
+        }else if (count >0 && count <3){
+            return Apiresponse.fail(SQL_DATA_CREATE_EXCEPTION);
         }else {
             return Apiresponse.fail(API_EXCEPTION);
         }
@@ -139,8 +140,6 @@ public class ArticleController {
 
         if (articleService.updateArticle(articleInfo,articleContent) == 2){
             return  Apiresponse.success(SUCCESS);
-        }else if (articleService.updateArticle(articleInfo,articleContent) == 1){
-            return Apiresponse.fail(SQL_DATA_CREATE_EXCEPTION);
         }else {
             return Apiresponse.fail(API_EXCEPTION);
         }

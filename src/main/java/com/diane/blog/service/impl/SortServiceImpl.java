@@ -1,7 +1,6 @@
 package com.diane.blog.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.diane.blog.dao.TblArticleCategoryMapper;
 import com.diane.blog.dao.TblArticleInfoMapper;
 import com.diane.blog.dao.TblCategoryInfoMapper;
@@ -9,9 +8,13 @@ import com.diane.blog.model.TblArticleCategory;
 import com.diane.blog.model.TblArticleCategoryExample;
 import com.diane.blog.model.TblCategoryInfo;
 import com.diane.blog.model.TblCategoryInfoExample;
+import com.diane.blog.service.ArticleService;
 import com.diane.blog.service.SortService;
+import com.diane.blog.util.ReturnCode;
+import com.diane.blog.util.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.diane.blog.util.JsonUtils.listToJsonArray;
 
@@ -29,9 +32,6 @@ public class SortServiceImpl implements SortService {
     @Autowired
     TblCategoryInfoMapper categoryInfoMapper;
 
-//    @Autowired
-//    TblCategoryInfoExample categoryInfoExample;
-
     @Autowired
     TblArticleCategoryMapper articleCategoryMapper;
 
@@ -42,6 +42,9 @@ public class SortServiceImpl implements SortService {
     @Autowired
     TblArticleInfoMapper articleInfoMapper;
 
+    @Autowired
+    ArticleService articleService;
+
     @Override
     public int createSort(TblCategoryInfo categoryInfo) {
         if (categoryInfo == null){
@@ -50,12 +53,41 @@ public class SortServiceImpl implements SortService {
             return categoryInfoMapper.insert(categoryInfo);
         }
     }
+//有个逻辑上的问题，如果分类中有内容，删除分类的话其内容也需要删除
 
+    /**
+     * 判断sort中是否有文章，若有就删文章，前端需要加提示
+     * @param id
+     * @return
+     */
+//    需要回滚
+    // FIXME: 2021/1/19 可能还有问题
+    @Transactional(rollbackFor = ServiceException.class)
     @Override
     public int delSort(Long id) {
-        return categoryInfoMapper.deleteByPrimaryKey(id);
+        TblCategoryInfo sortinfo = categoryInfoMapper.selectByPrimaryKey(id);
+        if (sortinfo == null){
+            return 0;
+        }
+        if (sortinfo.getNumber() == 0){
+            return categoryInfoMapper.deleteByPrimaryKey(id);
+        }else {
+//          删除该分类下所有文章，先获取所有需要删除文章的id，整成list，然后用for调用方法
+            TblArticleCategoryExample acExample = new TblArticleCategoryExample();
+            acExample.createCriteria().andSortIdEqualTo(id);
+            List<TblArticleCategory> artlist = articleCategoryMapper.selectByExample(acExample);
+            for (int i = 0; i < artlist.size(); i++) {
+                articleService.delArticle(artlist.get(i).getArticleId());
+            }
+//            删完再判断下
+            if (sortinfo.getNumber() == 0){
+                return categoryInfoMapper.deleteByPrimaryKey(id);
+            }else{
+                throw new ServiceException(ReturnCode.API_EXCEPTION);
+            }
+        }
     }
-
+//  这个再controller中没有调用，就先这样吧
     @Override
     public int delSort(String categoryName) {
         TblCategoryInfoExample categoryInfoExample = new TblCategoryInfoExample();
@@ -76,6 +108,7 @@ public class SortServiceImpl implements SortService {
 
     //  文章分类相关
 //    增加删除是sortInfo表里也需要同步数量
+    @Transactional(rollbackFor = ServiceException.class)
     @Override
     public int addArticleInSort(Long sortid, Long articleid) {
         articleCategory.setId(0L);
@@ -87,16 +120,34 @@ public class SortServiceImpl implements SortService {
 //      更新信息表
         TblCategoryInfo cateInfo =  categoryInfoMapper.selectByPrimaryKey(sortid);
         cateInfo.setNumber((byte) (cateInfo.getNumber()+1));
-        return categoryInfoMapper.updateByPrimaryKey(cateInfo) + articleCategoryMapper.insertSelective(articleCategory);
+        int a = categoryInfoMapper.updateByPrimaryKey(cateInfo);
+        int b = articleCategoryMapper.insertSelective(articleCategory);
+        if (a + b == 2){
+            return 2;
+        }else if (a + b == 1){
+            throw new ServiceException(ReturnCode.SQL_DATA_CREATE_EXCEPTION);
+        }else {
+            return 0;
+        }
     }
 
+    @Transactional(rollbackFor = ServiceException.class)
     @Override
     public int delArticleInSort(Long articleid) {
 
         TblArticleCategoryExample articleCategoryExample = new TblArticleCategoryExample();
 
         articleCategoryExample.createCriteria().andArticleIdEqualTo(articleid);
-        return articleCategoryMapper.deleteByExample(articleCategoryExample);
+        int a = articleCategoryMapper.deleteByExample(articleCategoryExample);
+//        分类文章内容减一
+        int b = articleCategoryMapper.reducecateinfonum(articleid);
+        if (a + b == 2){
+            return 2;
+        }else if (a + b == 1){
+            throw new ServiceException(ReturnCode.SQL_DATA_CREATE_EXCEPTION);
+        }else {
+            return 0;
+        }
     }
 
     @Override
