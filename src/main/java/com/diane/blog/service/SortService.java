@@ -20,15 +20,17 @@ public interface SortService {
     int delSort(String categoryName);
 
     JSONArray listSort();
+    //    更新分类名称
+    int updateSortName(Long sortid,String name);
 
-    //    文章分类相关操作(ArticleCategory)
+//   文章分类相关操作(ArticleCategory)
 //   将文章加分类
     int addArticleInSort(Long sortid, Long articleid);
-    //    将文章移出分类
+//   将文章移出分类
     int delArticleInSort(Long articleid);
-//    获取某个文章的分类id
+//   获取某个文章的分类id
     Long getArticleSort(Long artId);
-//    更新文章名称
-    int updateSortName(Long sortid,String name);
+//  更新文章的分类信息
+    int updateArtSortInfo(Long sortid,Long articleid);
 
 }

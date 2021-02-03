@@ -140,13 +140,11 @@ public class SortServiceImpl implements SortService {
         articleCategoryExample.createCriteria().andArticleIdEqualTo(articleid);
         int a = articleCategoryMapper.deleteByExample(articleCategoryExample);
 //        分类文章内容减一
-        int b = articleCategoryMapper.reducecateinfonum(articleid);
-        if (a + b == 2){
-            return 2;
-        }else if (a + b == 1){
-            throw new ServiceException(ReturnCode.SQL_DATA_CREATE_EXCEPTION);
+        articleCategoryMapper.reducecateinfonum(articleid);
+        if (a == 1){
+            return 1;
         }else {
-            return 0;
+            throw new ServiceException(ReturnCode.SQL_DATA_CREATE_EXCEPTION);
         }
     }
 
@@ -168,6 +166,21 @@ public class SortServiceImpl implements SortService {
                 }
 //            }
         }
+    }
+
+    @Override
+    public int updateArtSortInfo(Long sortid, Long articleid) {
+        articleCategory.setId(0L);
+        articleCategory.setSortId(sortid);
+        articleCategory.setArticleId(articleid);
+        articleCategory.setCreateBy(new Date());
+        articleCategory.setModifiedBy(new Date());
+        articleCategory.setIsEffective(true);
+
+        TblArticleCategoryExample articleCategoryExample = new TblArticleCategoryExample();
+        articleCategoryExample.createCriteria().andArticleIdEqualTo(articleid);
+        int b = articleCategoryMapper.updateByExample(articleCategory,articleCategoryExample);
+        return b;
     }
 
     @Override

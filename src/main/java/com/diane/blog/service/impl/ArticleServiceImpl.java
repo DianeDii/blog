@@ -13,13 +13,11 @@ import com.diane.blog.util.ReturnCode;
 import com.diane.blog.util.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 import static com.diane.blog.util.JsonUtils.listToJsonArray;
-import static com.diane.blog.util.JsonUtils.mapToJSONObject;
 
 /**
  * @author dianedi
@@ -75,14 +73,17 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public int updateArticle(TblArticleInfo articleInfo, TblArticleContent articleContent) {
 //        根据文章id查询内容表里的文章内容content
-//        System.out.println("id="+articleInfo.getId());
         TblArticleContentExample contentExample = new TblArticleContentExample();
         TblArticleInfoExample infoExample = new TblArticleInfoExample();
         contentExample.createCriteria().andArticleIdEqualTo(articleInfo.getId());
+//
+//        List<TblArticleContent> contents = articleContentMapper.selectByExample(contentExample);
+//        articleContent.setId(contents.get(0).getId());
+
 //      example更新：第一个参数是更新后的数据组成的对象，第二个参数是example构造的查询条件即要更新的属性。
         infoExample.createCriteria().andIdEqualTo(articleInfo.getId());
 //        return articleContentMapper.updateByExampleSelective(articleContent,contentExample) + articleInfoMapper.updateByExampleSelective(articleInfo,infoExample);
-        int a = articleContentMapper.updateByExample(articleContent,contentExample);
+        int a = articleContentMapper.updateByExampleSelective(articleContent,contentExample);
         int b = articleInfoMapper.updateByExample(articleInfo,infoExample);
         if (a + b == 2){
             return 2;
@@ -103,12 +104,12 @@ public class ArticleServiceImpl implements ArticleService {
         if (content.size() == 0){
           return -1;
         }else {
-            int c = articleCategoryMapper.reducecateinfonum(artId);
+            articleCategoryMapper.reducecateinfonum(artId);
             int b = articleContentMapper.deleteByPrimaryKey(content.get(0).getId());
             int a = articleInfoMapper.deleteByPrimaryKey(artId);
-            if (a + b + c == 3){
-                return 3;
-            }else if (a + b +c >0 && a + b + c <3){
+            if (a + b  == 2){
+                return 2;
+            }else if (a + b == 1){
                 throw new ServiceException(ReturnCode.SQL_DATA_CREATE_EXCEPTION);
             }else {
                 return 0;
@@ -157,22 +158,17 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public JSONObject listAllBlog() {
+    public String listAllBlog() {
         TblArticleCategoryExample articleCategoryExample = new TblArticleCategoryExample();
-
         articleCategoryExample.createCriteria()    //不查预设的三个分类
                 .andSortIdGreaterThanOrEqualTo(4L);
-        List<TblArticleCategory> result = articleCategoryMapper.selectByExample(articleCategoryExample);
-        Map<String, Long> sortmap = new HashMap<>();
-        for (int i = 0; i < result.size(); i++){
-            TblArticleInfo articleInfo = articleInfoMapper.selectByPrimaryKey(result.get(i).getArticleId());
-//            null处理
-            if(articleInfo != null) {
-                sortmap.put(articleInfo.getTitle(), articleInfo.getId());
-                }
-            }
-        if (sortmap.size() != 0) {
-            return mapToJSONObject(sortmap);
+        List<TblArticleCategory> articleCategories = articleCategoryMapper.selectByExample(articleCategoryExample);
+        List<TblArticleInfo> result = new ArrayList<>();
+        for (int i = 0; i < articleCategories.size(); i++) {
+            result.add(articleInfoMapper.selectByPrimaryKey(articleCategories.get(i).getArticleId()));
+        }
+        if (result.size() != 0 && result != null) {
+            return JSONObject.toJSONString(result);
         }else {
             return null;
         }

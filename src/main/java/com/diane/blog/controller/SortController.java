@@ -104,6 +104,21 @@ public class SortController {
         }
     }
 
+    @ApiOperation("为文章更新分类信息")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200,message = "更新成功"),
+            @ApiResponse(code = 500,message = "更新失败"),
+    })
+    @PostMapping("/artupdate")
+    public @ResponseBody Apiresponse updateArticleSort(@ApiParam("{'sortId': xx,'articleId': xx}") @RequestBody String data){
+        JSONObject newArtSortInfo = JSONObject.parseObject(data);
+        if (sortService.updateArtSortInfo(Long.valueOf(newArtSortInfo.get("sortId").toString()),Long.valueOf(newArtSortInfo.get("articleId").toString())) == 1){
+            return Apiresponse.success(SUCCESS);
+        }else {
+            return Apiresponse.fail(API_EXCEPTION);
+        }
+    }
+
     @ApiOperation("给文章移除分类")
     @ApiResponses(value = {
             @ApiResponse(code = 200,message = "移除成功"),
@@ -111,7 +126,7 @@ public class SortController {
     })
     @DeleteMapping("/remove")
     public Apiresponse removeArticleInSort(@ApiParam("文章Id") @RequestParam("articleId") Long articleId){
-        if (sortService.delArticleInSort(articleId) == 2){
+        if (sortService.delArticleInSort(articleId) == 1){
             return  Apiresponse.success(SUCCESS);
         }else {
             return Apiresponse.fail(API_EXCEPTION);

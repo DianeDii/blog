@@ -34,7 +34,7 @@ public interface ArticleService {
     //    展示某分类所有文章
     String listAllArticleInSort(Long sortid);
     //    展示除随笔分类的其他文章(技术博客文章)
-    JSONObject listAllBlog();
+    String listAllBlog();
     //  模糊全局查询
     String searchArticleByKeyword(String keyword);
 //    获取最近时间的五篇文章

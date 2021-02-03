@@ -99,5 +99,5 @@ public interface TblArticleCategoryMapper {
 
 //    传入一个artId，使该文章所在目录下的文章数量-1
     @Select("UPDATE tbl_category_info SET number = number -1 WHERE id =(SELECT ac.sort_id FROM tbl_article_category ac WHERE ac.article_id = #{artId});")
-    int reducecateinfonum(Long artId);
+    void reducecateinfonum(Long artId);
 }

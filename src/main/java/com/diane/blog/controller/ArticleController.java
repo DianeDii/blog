@@ -94,11 +94,11 @@ public class ArticleController {
     @DeleteMapping("/del")
     public Apiresponse deleteArticle(@ApiParam("文章id") @RequestParam("artID") Long artID){
         int count = articleService.delArticle(artID);
-        if (count == 3){
+        if (count == 2){
             return Apiresponse.success(SUCCESS);
         }else if(count == -1){
             return Apiresponse.fail(NOT_FOUND);
-        }else if (count >0 && count <3){
+        }else if (count == 1){
             return Apiresponse.fail(SQL_DATA_CREATE_EXCEPTION);
         }else {
             return Apiresponse.fail(API_EXCEPTION);
@@ -124,17 +124,19 @@ public class ArticleController {
 //        解析data并插入article，初始化文章
 //        json数据传入顺序应与数据库表字段顺序相同
         JSONObject updateData = JSONObject.parseObject(data);
-
+        System.out.println(new Date());
         articleInfo.setId(Long.valueOf(updateData.get("artid").toString()));
         articleInfo.setTitle(updateData.get("title").toString());
 //        articleInfo.setCreateBy(new Date());
         articleInfo.setIsTop(false);
         articleInfo.setModifiedBy(new Date());
         articleInfo.setSummary(updateData.get("summary").toString());
+        articleInfo.setCreateBy(new Date());
         articleInfo.setTraffic(0);
 
 //        文章内容应该不能是string格式的
         articleContent.setContent(updateData.get("content").toString());
+        articleContent.setArticleId(Long.valueOf(updateData.get("artid").toString()));
         articleContent.setCreateBy(new Date());
         articleContent.setModifieldBy(new Date());
 
