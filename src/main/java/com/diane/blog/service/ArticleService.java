@@ -24,15 +24,15 @@ public interface ArticleService {
 //    更新博客
     int updateArticle(TblArticleInfo articleInfo,TblArticleContent articleContent);
 //    删除博客
-    int delArticle(Long artId);
+    int delArticle(String artId);
 //    详情：标题，正文，创建时间
 //    查看博文详情
-    JSONArray listArticleDetail(Long artId);
+    JSONArray listArticleDetail(String artId);
 //    概览 标题，简介
 //    查看所有博文概览
     String listAllArticle();
     //    展示某分类所有文章
-    String listAllArticleInSort(Long sortid);
+    String listAllArticleInSort(int sortid);
     //    展示除随笔分类的其他文章(技术博客文章)
     String listAllBlog();
     //  模糊全局查询

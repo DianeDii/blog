@@ -60,7 +60,7 @@ public class SortController {
     })
     @DeleteMapping("/del")
     public Apiresponse delSort(@ApiParam("分类Id") @RequestParam("sortId") String Id) {
-        Long sortId = Long.parseLong(Id);
+        int sortId = Integer.parseInt(Id);
         if (sortService.delSort(sortId) == 1){
             return Apiresponse.success(SUCCESS);
         }else if (sortService.delSort(sortId) == 0){
@@ -95,9 +95,9 @@ public class SortController {
     Apiresponse addArticleInSort(@ApiParam("{'sortId': xx,'articleId': xx}") @RequestBody String data){
         JSONObject addSortInfo = JSONObject.parseObject(data);
         System.out.println(addSortInfo.size());
-        if (sortService.addArticleInSort(Long.valueOf(addSortInfo.get("sortId").toString()),Long.valueOf(addSortInfo.get("articleId").toString())) == 2){
+        if (sortService.addArticleInSort(Integer.valueOf(addSortInfo.get("sortId").toString()),addSortInfo.get("articleId").toString()) == 2){
             return Apiresponse.success(SUCCESS);
-        }else if (sortService.addArticleInSort((long)addSortInfo.get("sortId"),(long)addSortInfo.get("articleId")) == 1){
+        }else if (sortService.addArticleInSort((int) addSortInfo.get("sortId"),addSortInfo.get("articleId").toString()) == 1){
             return Apiresponse.fail(SQL_DATA_CREATE_EXCEPTION);
         }else {
             return Apiresponse.fail(API_EXCEPTION);
@@ -110,9 +110,9 @@ public class SortController {
             @ApiResponse(code = 500,message = "更新失败"),
     })
     @PostMapping("/artupdate")
-    public @ResponseBody Apiresponse updateArticleSort(@ApiParam("{'sortId': xx,'articleId': xx}") @RequestBody String data){
+    public @ResponseBody Apiresponse updateArticleSort(@ApiParam("{'sortid': xx,'articleId': xx}") @RequestBody String data){
         JSONObject newArtSortInfo = JSONObject.parseObject(data);
-        if (sortService.updateArtSortInfo(Long.valueOf(newArtSortInfo.get("sortId").toString()),Long.valueOf(newArtSortInfo.get("articleId").toString())) == 1){
+        if (sortService.updateArtSortInfo(Integer.valueOf(newArtSortInfo.get("sortId").toString()),newArtSortInfo.get("articleId").toString()) == 1){
             return Apiresponse.success(SUCCESS);
         }else {
             return Apiresponse.fail(API_EXCEPTION);
@@ -125,7 +125,7 @@ public class SortController {
             @ApiResponse(code = 500,message = "移除失败"),
     })
     @DeleteMapping("/remove")
-    public Apiresponse removeArticleInSort(@ApiParam("文章Id") @RequestParam("articleId") Long articleId){
+    public Apiresponse removeArticleInSort(@ApiParam("文章Id") @RequestParam("articleId") String articleId){
         if (sortService.delArticleInSort(articleId) == 1){
             return  Apiresponse.success(SUCCESS);
         }else {
@@ -140,7 +140,7 @@ public class SortController {
             @ApiResponse(code = 500,message = "该文章有多条分类信息")
     })
     @GetMapping("/{artID}")
-    public Apiresponse findArtSort(@PathVariable("artID") Long artID){
+    public Apiresponse findArtSort(@PathVariable("artID") String artID){
         if (sortService.getArticleSort(artID)== -1){
             return Apiresponse.fail(NOT_FOUND);
         }else if (sortService.getArticleSort(artID)== -2){
@@ -162,7 +162,7 @@ public class SortController {
     public @ResponseBody
     Apiresponse updateSortName(@RequestBody String data){
         JSONObject updateData = JSONObject.parseObject(data);
-        int result = sortService.updateSortName(Long.valueOf(updateData.get("sortid").toString()),updateData.get("value").toString());
+        int result = sortService.updateSortName(Integer.valueOf(updateData.get("sortid").toString()),updateData.get("value").toString());
         if (result == 0){
             return Apiresponse.fail(API_EXCEPTION);
         }else if (result == 1){

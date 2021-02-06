@@ -64,7 +64,7 @@ public class SortServiceImpl implements SortService {
     // FIXME: 2021/1/19 可能还有问题
     @Transactional(rollbackFor = ServiceException.class)
     @Override
-    public int delSort(Long id) {
+    public int delSort(int id) {
         TblCategoryInfo sortinfo = categoryInfoMapper.selectByPrimaryKey(id);
         if (sortinfo == null){
             return 0;
@@ -99,7 +99,7 @@ public class SortServiceImpl implements SortService {
     public JSONArray listSort() {
         TblCategoryInfoExample categoryInfoExample = new TblCategoryInfoExample();
 //        is_effective是否启用字段先不用
-        categoryInfoExample.createCriteria().andIdGreaterThanOrEqualTo(4L);
+        categoryInfoExample.createCriteria().andIdGreaterThanOrEqualTo(4);
         List<TblCategoryInfo> allSort= categoryInfoMapper.selectByExample(categoryInfoExample);
         return listToJsonArray(allSort);
     }
@@ -110,7 +110,7 @@ public class SortServiceImpl implements SortService {
 //    增加删除是sortInfo表里也需要同步数量
     @Transactional(rollbackFor = ServiceException.class)
     @Override
-    public int addArticleInSort(Long sortid, Long articleid) {
+    public int addArticleInSort(int sortid, String articleid) {
         articleCategory.setId(0L);
         articleCategory.setSortId(sortid);
         articleCategory.setArticleId(articleid);
@@ -133,7 +133,7 @@ public class SortServiceImpl implements SortService {
 
     @Transactional(rollbackFor = ServiceException.class)
     @Override
-    public int delArticleInSort(Long articleid) {
+    public int delArticleInSort(String articleid) {
 
         TblArticleCategoryExample articleCategoryExample = new TblArticleCategoryExample();
 
@@ -149,10 +149,10 @@ public class SortServiceImpl implements SortService {
     }
 
     @Override
-    public Long getArticleSort(Long artId) {
+    public int getArticleSort(String artId) {
 //        先边界处理，查看有没有这个id
         if (articleInfoMapper.selectByPrimaryKey(artId) == null){
-            return -1L;//该文章不存在
+            return -1;//该文章不存在
         }else {
             TblArticleCategoryExample articleCategoryExample = new TblArticleCategoryExample();
             articleCategoryExample.createCriteria().andArticleIdEqualTo(artId);
@@ -160,31 +160,31 @@ public class SortServiceImpl implements SortService {
                 if (articleCategories.size() ==1){
                     return articleCategories.get(0).getSortId();
                 }else if(articleCategories.size() ==0){
-                    return -2L;//该文章无分类信息
+                    return -2;//该文章无分类信息
                 }else {
-                    return -3L;//非法！该文章有多条分类信息
+                    return -3;//非法！该文章有多条分类信息
                 }
 //            }
         }
     }
 
     @Override
-    public int updateArtSortInfo(Long sortid, Long articleid) {
-        articleCategory.setId(0L);
+    public int updateArtSortInfo(int sortid, String articleid) {
+        articleCategory.setId(null);
         articleCategory.setSortId(sortid);
         articleCategory.setArticleId(articleid);
-        articleCategory.setCreateBy(new Date());
+        articleCategory.setCreateBy(null);
         articleCategory.setModifiedBy(new Date());
-        articleCategory.setIsEffective(true);
+        articleCategory.setIsEffective(null);
 
         TblArticleCategoryExample articleCategoryExample = new TblArticleCategoryExample();
         articleCategoryExample.createCriteria().andArticleIdEqualTo(articleid);
-        int b = articleCategoryMapper.updateByExample(articleCategory,articleCategoryExample);
+        int b = articleCategoryMapper.updateByExampleSelective(articleCategory,articleCategoryExample);
         return b;
     }
 
     @Override
-    public int updateSortName(Long sortId,String name) {
+    public int updateSortName(int sortId,String name) {
         TblCategoryInfo info = new TblCategoryInfo();
         info.setNumber(null);
         info.setModifiedBy(null);
@@ -194,6 +194,7 @@ public class SortServiceImpl implements SortService {
         info.setName(name);
         int a = categoryInfoMapper.updateByPrimaryKeySelective(info);
         return a;
+
     }
 
 

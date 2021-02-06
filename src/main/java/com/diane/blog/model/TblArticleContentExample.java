@@ -267,52 +267,62 @@ public class TblArticleContentExample {
             return (Criteria) this;
         }
 
-        public Criteria andArticleIdEqualTo(Long value) {
+        public Criteria andArticleIdEqualTo(String value) {
             addCriterion("article_id =", value, "articleId");
             return (Criteria) this;
         }
 
-        public Criteria andArticleIdNotEqualTo(Long value) {
+        public Criteria andArticleIdNotEqualTo(String value) {
             addCriterion("article_id <>", value, "articleId");
             return (Criteria) this;
         }
 
-        public Criteria andArticleIdGreaterThan(Long value) {
+        public Criteria andArticleIdGreaterThan(String value) {
             addCriterion("article_id >", value, "articleId");
             return (Criteria) this;
         }
 
-        public Criteria andArticleIdGreaterThanOrEqualTo(Long value) {
+        public Criteria andArticleIdGreaterThanOrEqualTo(String value) {
             addCriterion("article_id >=", value, "articleId");
             return (Criteria) this;
         }
 
-        public Criteria andArticleIdLessThan(Long value) {
+        public Criteria andArticleIdLessThan(String value) {
             addCriterion("article_id <", value, "articleId");
             return (Criteria) this;
         }
 
-        public Criteria andArticleIdLessThanOrEqualTo(Long value) {
+        public Criteria andArticleIdLessThanOrEqualTo(String value) {
             addCriterion("article_id <=", value, "articleId");
             return (Criteria) this;
         }
 
-        public Criteria andArticleIdIn(List<Long> values) {
+        public Criteria andArticleIdLike(String value) {
+            addCriterion("article_id like", value, "articleId");
+            return (Criteria) this;
+        }
+
+        public Criteria andArticleIdNotLike(String value) {
+            addCriterion("article_id not like", value, "articleId");
+            return (Criteria) this;
+        }
+
+        public Criteria andArticleIdIn(List<String> values) {
             addCriterion("article_id in", values, "articleId");
             return (Criteria) this;
         }
 
-        public Criteria andArticleIdNotIn(List<Long> values) {
+        public Criteria andArticleIdNotIn(List<String> values) {
             addCriterion("article_id not in", values, "articleId");
             return (Criteria) this;
         }
 
-        public Criteria andArticleIdBetween(Long value1, Long value2) {
+        public Criteria andArticleIdBetween(String value1, String value2) {
             addCriterion("article_id between", value1, value2, "articleId");
             return (Criteria) this;
         }
 
-        public Criteria andArticleIdNotBetween(Long value1, Long value2) {
+        public Criteria andArticleIdNotBetween(String value1, String value2) {
             addCriterion("article_id not between", value1, value2, "articleId");
             return (Criteria) this;
         }

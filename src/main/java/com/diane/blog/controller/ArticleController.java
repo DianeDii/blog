@@ -7,6 +7,7 @@ import com.diane.blog.model.TblArticleContent;
 import com.diane.blog.model.TblArticleInfo;
 import com.diane.blog.service.ArticleService;
 import com.diane.blog.util.Apiresponse;
+import com.diane.blog.util.CreateKeyUtil;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -57,7 +58,8 @@ public class ArticleController {
 //        解析data并插入article，初始化文章
 //        json数据传入顺序应与数据库表字段顺序相同
         JSONObject newArticle = JSONObject.parseObject(data);
-        articleInfo.setId(0L);
+        CreateKeyUtil key = new CreateKeyUtil();
+        articleInfo.setId(key.getUUIDKey());
         articleInfo.setTitle(newArticle.get("title").toString());
         articleInfo.setCreateBy(new Date());
         articleInfo.setIsTop(false);
@@ -65,7 +67,6 @@ public class ArticleController {
         articleInfo.setSummary(newArticle.get("summary").toString());
         articleInfo.setTraffic(0);
 
-//        文章内容应该不能是string格式的
 
         articleContent.setContent(newArticle.get("content").toString());
         articleContent.setCreateBy(new Date());
@@ -73,7 +74,7 @@ public class ArticleController {
 
         if (articleService.submitArticle(articleInfo,articleContent) == 2){
 //            带回一个新建文章的id
-            return  Apiresponse.success(articleInfoMapper.selectLast());
+            return  Apiresponse.success(articleInfo.getId());
         }else {
             return Apiresponse.fail(API_EXCEPTION);
         }
@@ -92,7 +93,7 @@ public class ArticleController {
             @ApiResponse(code = 501,message = "文章未删除完全"),
     })
     @DeleteMapping("/del")
-    public Apiresponse deleteArticle(@ApiParam("文章id") @RequestParam("artID") Long artID){
+    public Apiresponse deleteArticle(@ApiParam("文章id") @RequestParam("artID") String artID){
         int count = articleService.delArticle(artID);
         if (count == 2){
             return Apiresponse.success(SUCCESS);
@@ -125,7 +126,7 @@ public class ArticleController {
 //        json数据传入顺序应与数据库表字段顺序相同
         JSONObject updateData = JSONObject.parseObject(data);
         System.out.println(new Date());
-        articleInfo.setId(Long.valueOf(updateData.get("artid").toString()));
+        articleInfo.setId(updateData.get("artid").toString());
         articleInfo.setTitle(updateData.get("title").toString());
 //        articleInfo.setCreateBy(new Date());
         articleInfo.setIsTop(false);
@@ -136,8 +137,8 @@ public class ArticleController {
 
 //        文章内容应该不能是string格式的
         articleContent.setContent(updateData.get("content").toString());
-        articleContent.setArticleId(Long.valueOf(updateData.get("artid").toString()));
-        articleContent.setCreateBy(new Date());
+        articleContent.setArticleId(updateData.get("artid").toString());
+//        articleContent.setCreateBy(new Date());
         articleContent.setModifieldBy(new Date());
 
         if (articleService.updateArticle(articleInfo,articleContent) == 2){
@@ -160,7 +161,7 @@ public class ArticleController {
     })
 //    @CrossOrigin(origins = "*",maxAge = 3600)
     @GetMapping("/{artID}")
-    public Apiresponse ArticleDetail(@ApiParam("文章id") @PathVariable("artID") Long artID){
+    public Apiresponse ArticleDetail(@ApiParam("文章id") @PathVariable("artID") String artID){
         if (articleService == null){
             return Apiresponse.fail(NOT_FOUND);
         }else{
@@ -191,7 +192,7 @@ public class ArticleController {
             @ApiResponse(code = 500,message = "查询失败")
     })
     @GetMapping("/listbysort/{sortid}")
-    public Apiresponse ListbySort(@ApiParam("分类Id")@PathVariable("sortid") Long sortid){
+    public Apiresponse ListbySort(@ApiParam("分类Id")@PathVariable("sortid") int sortid){
         if (articleService.listAllArticleInSort(sortid) != null){
             return Apiresponse.success(articleService.listAllArticleInSort(sortid));
         }else {

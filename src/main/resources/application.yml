@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/blog?useUnicode=true&useSSL=false&useJDBCCompliantTimezoneShift=true&serverTimezone=UTC&characterEncoding=utf8
+    url: jdbc:mysql://8.131.228.245:3306/blog?useUnicode=true&useSSL=false&useJDBCCompliantTimezoneShift=true&serverTimezone=UTC&characterEncoding=utf8
     username: root
-    password: 111111
+    password: dgy990416
     driver-class-name: com.mysql.cj.jdbc.Driver
   resources:
     static-locations: classpath:/static/,classpath:/view/,classpath:/public,classpath:/resources,classpath:/META-INF/

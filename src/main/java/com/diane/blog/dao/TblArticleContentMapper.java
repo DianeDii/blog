@@ -121,8 +121,7 @@ public interface TblArticleContentMapper {
      */
     int updateByPrimaryKey(TblArticleContent record);
 
-//  模糊查询文章正文（fulltext）
+    //  模糊查询文章正文（fulltext）
     @Select("select article_id from tbl_article_content where match(content) against(#{keyword})")
-    List<Long> selectcontentLikeWord(String keyword);
-
+    List<String> selectcontentLikeWord(String keyword);
 }

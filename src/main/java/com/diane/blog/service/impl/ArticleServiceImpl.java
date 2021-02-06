@@ -9,6 +9,7 @@ import com.diane.blog.dao.TblCategoryInfoMapper;
 import com.diane.blog.model.*;
 
 import com.diane.blog.service.ArticleService;
+import com.diane.blog.util.CreateKeyUtil;
 import com.diane.blog.util.ReturnCode;
 import com.diane.blog.util.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,13 +52,14 @@ public class ArticleServiceImpl implements ArticleService {
     @Transactional(rollbackFor = ServiceException.class)
     @Override
     public int submitArticle(TblArticleInfo articleInfo, TblArticleContent articleContent) {
+
         articleContent.setId(0L);
 //        查询插入的最后一条articleInfo的id
 //        Example还是有很大缺陷啊，没封装函数，很多sql就写不出来。
 //        在TblArticleInfoMapper中写了查询
         int a = articleInfoMapper.insertSelective(articleInfo);
 //      写conrent写不进去
-        articleContent.setArticleId(articleInfoMapper.selectLast());
+        articleContent.setArticleId(articleInfo.getId());
         int b = articleContentMapper.insert(articleContent);
         if (a + b == 2){
             return 2;
@@ -97,7 +99,7 @@ public class ArticleServiceImpl implements ArticleService {
 //    查询所删除文章所在分类，使分类信息表中该分类的num-1
     @Transactional(rollbackFor = ServiceException.class)
     @Override
-    public int delArticle(Long artId) {
+    public int delArticle(String artId) {
         TblArticleContentExample contentExample = new TblArticleContentExample();
         contentExample.createCriteria().andArticleIdEqualTo(artId);
         List<TblArticleContent> content = articleContentMapper.selectByExample(contentExample);
@@ -118,14 +120,13 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public JSONArray listArticleDetail(Long artId) {
+    public JSONArray listArticleDetail(String artId) {
         TblArticleContentExample contentExample = new TblArticleContentExample();
         TblArticleInfo articleInfo = articleInfoMapper.selectByPrimaryKey(artId);
 //        根据文章id查询内容表里的文章内容content
             contentExample.createCriteria().andArticleIdEqualTo(artId);
 //      读取text类型的要用selectByExampleWithBLOBs()
             List<TblArticleContent> content = articleContentMapper.selectByExampleWithBLOBs(contentExample);
-            System.out.println("content= "+content.size());
             if (content.size()!= 0){
                 List<String> list = new ArrayList<>();
                 list.add(articleInfo.getTitle());
@@ -148,7 +149,7 @@ public class ArticleServiceImpl implements ArticleService {
         }
     }
     @Override
-    public String listAllArticleInSort(Long sortid) {
+    public String listAllArticleInSort(int sortid) {
         List<TblArticleInfo> result = articleInfoMapper.listArticleInSort(sortid);
         if(result.size() != 0 && result != null){
             return JSONObject.toJSONString(result);
@@ -161,7 +162,7 @@ public class ArticleServiceImpl implements ArticleService {
     public String listAllBlog() {
         TblArticleCategoryExample articleCategoryExample = new TblArticleCategoryExample();
         articleCategoryExample.createCriteria()    //不查预设的三个分类
-                .andSortIdGreaterThanOrEqualTo(4L);
+                .andSortIdGreaterThanOrEqualTo(4);
         List<TblArticleCategory> articleCategories = articleCategoryMapper.selectByExample(articleCategoryExample);
         List<TblArticleInfo> result = new ArrayList<>();
         for (int i = 0; i < articleCategories.size(); i++) {

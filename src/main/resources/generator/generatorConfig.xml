@@ -35,7 +35,6 @@
         <table tableName="tbl_article_category"></table>
         <table tableName="tbl_article_content"></table>
         <table tableName="tbl_article_info"></table>
-        <table tableName="tbl_article_picture"></table>
         <table tableName="tbl_category_info"></table>
 
 
