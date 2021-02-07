@@ -2,10 +2,11 @@ package com.diane.blog.dao;
 
 import com.diane.blog.model.TblArticleInfo;
 import com.diane.blog.model.TblArticleInfoExample;
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public interface TblArticleInfoMapper {
@@ -98,13 +99,16 @@ public interface TblArticleInfoMapper {
     int updateByPrimaryKey(TblArticleInfo record);
 
     //    查询最近五篇文章(不要sortId = 2/3的分类)
-    @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id =ac.article_id AND ac.sort_id <>2 AND ac.sort_id <>3 ORDER BY modified_by DESC LIMIT 0,5")
+    @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id =ac.article_id AND ac.sort_id <>2 AND ac.sort_id <>3 AND traffic =0 ORDER BY modified_by DESC LIMIT 0,5")
     List<TblArticleInfo> rencentArticle();
     //    查询所有文章（除预设分类下）
-    @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id =ac.article_id AND ac.sort_id <>2 AND ac.sort_id <>3")
+    @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id =ac.article_id AND ac.sort_id <>2 AND ac.sort_id <>3 AND traffic =0")
     List<TblArticleInfo> listArticle();
     //    查询某分类下的所有文章
-    @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id = ac.article_id AND ac.sort_id = #{sortId}")
+    @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id = ac.article_id AND ac.sort_id = #{sortId} AND traffic =0")
     List<TblArticleInfo> listArticleInSort(int sortId);
+    //    查询已删除的文章(非sortid = 2/3的分类)
+    @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id =ac.article_id AND ac.sort_id <>2 AND ac.sort_id <>3 AND traffic =1")
+    List<TblArticleInfo> listDeletedArt();
 
 }

@@ -1,10 +1,8 @@
 package com.diane.blog.service;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.diane.blog.model.TblArticleContent;
 import com.diane.blog.model.TblArticleInfo;
-
 import org.springframework.stereotype.Service;
 
 /**
@@ -39,4 +37,8 @@ public interface ArticleService {
     String searchArticleByKeyword(String keyword);
 //    获取最近时间的五篇文章
     String recentArticle();
+//    获取已删除的文章
+    String listdeletedArt();
+//    恢复已删除文章
+    int recoveryArt(String artId);
 }

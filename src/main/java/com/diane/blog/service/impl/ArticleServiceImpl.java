@@ -7,16 +7,15 @@ import com.diane.blog.dao.TblArticleContentMapper;
 import com.diane.blog.dao.TblArticleInfoMapper;
 import com.diane.blog.dao.TblCategoryInfoMapper;
 import com.diane.blog.model.*;
-
 import com.diane.blog.service.ArticleService;
-import com.diane.blog.util.CreateKeyUtil;
 import com.diane.blog.util.ReturnCode;
 import com.diane.blog.util.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.diane.blog.util.JsonUtils.listToJsonArray;
 
@@ -100,15 +99,11 @@ public class ArticleServiceImpl implements ArticleService {
     @Transactional(rollbackFor = ServiceException.class)
     @Override
     public int delArticle(String artId) {
-        TblArticleContentExample contentExample = new TblArticleContentExample();
-        contentExample.createCriteria().andArticleIdEqualTo(artId);
-        List<TblArticleContent> content = articleContentMapper.selectByExample(contentExample);
-        if (content.size() == 0){
-          return -1;
-        }else {
-            articleCategoryMapper.reducecateinfonum(artId);
-            int b = articleContentMapper.deleteByPrimaryKey(content.get(0).getId());
-            int a = articleInfoMapper.deleteByPrimaryKey(artId);
+//        content
+        TblArticleInfo delArt = articleInfoMapper.selectByPrimaryKey(artId);
+        delArt.setTraffic(1);
+        int a = articleInfoMapper.updateByPrimaryKey(delArt);
+        int b = articleCategoryMapper.reducecateinfonum(artId);
             if (a + b  == 2){
                 return 2;
             }else if (a + b == 1){
@@ -116,7 +111,6 @@ public class ArticleServiceImpl implements ArticleService {
             }else {
                 return 0;
             }
-        }
     }
 
     @Override
@@ -167,6 +161,12 @@ public class ArticleServiceImpl implements ArticleService {
         List<TblArticleInfo> result = new ArrayList<>();
         for (int i = 0; i < articleCategories.size(); i++) {
             result.add(articleInfoMapper.selectByPrimaryKey(articleCategories.get(i).getArticleId()));
+        }
+        //去除traffic =1 的数据（已删除的）
+        for (int i = 0; i < result.size(); i++) {
+            if (result.get(i).getTraffic() ==1){
+                result.remove(i);
+            }
         }
         if (result.size() != 0 && result != null) {
             return JSONObject.toJSONString(result);
@@ -222,11 +222,31 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public String recentArticle() {
-        TblArticleInfoExample infoExample = new TblArticleInfoExample();
         if (articleInfoMapper.rencentArticle().size() ==0){
             return null;
         }else {
             return JSONObject.toJSONString(articleInfoMapper.rencentArticle());
+        }
+    }
+
+    @Override
+    public String listdeletedArt() {
+        return JSONObject.toJSONString(articleInfoMapper.listDeletedArt());
+    }
+
+    @Transactional(rollbackFor = ServiceException.class)
+    @Override
+    public int recoveryArt(String artId) {
+        TblArticleInfo recoveryArt = articleInfoMapper.selectByPrimaryKey(artId);
+        recoveryArt.setTraffic(0);
+        int a = articleInfoMapper.updateByPrimaryKey(recoveryArt);
+        int b = articleCategoryMapper.pluscateinfonum(artId);
+        if (a + b  == 2){
+            return 2;
+        }else if (a + b == 1){
+            throw new ServiceException(ReturnCode.SQL_DATA_CREATE_EXCEPTION);
+        }else {
+            return 0;
         }
     }
 

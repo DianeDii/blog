@@ -246,5 +246,33 @@ public class ArticleController {
         }
     }
 
+    @ApiOperation("展示已删除的文章（非实验室/关于））")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200,message = "查询成功"),
+            @ApiResponse(code = 404,message = "无文章"),
+            @ApiResponse(code = 500,message = "查询失败")
+    })
+    @PostMapping("/listdeleted")
+    public Apiresponse deletedArticle(){
+        if (articleService.listdeletedArt() ==null){
+            return Apiresponse.fail(NOT_FOUND);
+        }else {
+            return Apiresponse.success(articleService.listdeletedArt());
+        }
+    }
 
+
+    @ApiOperation("恢复已删除文章")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200,message = "恢复成功"),
+            @ApiResponse(code = 500,message = "恢复失败")
+    })
+    @PostMapping("/recoveryArt")
+    public Apiresponse recoveryArticle(@ApiParam("文章id") @RequestParam("artID") String artID){
+        if (articleService.recoveryArt(artID) == 2){
+            return Apiresponse.success(SUCCESS);
+        }else {
+            return Apiresponse.success("无文章");
+        }
+    }
 }
