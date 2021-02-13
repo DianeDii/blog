@@ -14,5 +14,5 @@
     
  * 后端项目地址：https://github.com/DianeDii/blog
  * 前端项目地址:https://github.com/DianeDii/blog_vue
- * 博客演示地址：http://8.131.228.245/
- * 后端接口文档地址：http://8.131.228.245:8081/swagger-ui.html
+ * 博客演示地址：http://dianedii.top/
+ * 后端接口文档地址：http://dianedii.top:8081/swagger-ui.html
