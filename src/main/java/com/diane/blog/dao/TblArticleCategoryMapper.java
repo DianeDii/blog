@@ -3,7 +3,7 @@ package com.diane.blog.dao;
 import com.diane.blog.model.TblArticleCategory;
 import com.diane.blog.model.TblArticleCategoryExample;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -99,8 +99,8 @@ public interface TblArticleCategoryMapper {
     int updateByPrimaryKey(TblArticleCategory record);
 
     //    传入一个artId，使该文章所在目录下的文章数量-1
-    @Select("UPDATE tbl_category_info SET number = number -1 WHERE id =(SELECT ac.sort_id FROM tbl_article_category ac WHERE ac.article_id = #{artId});")
+    @Update("UPDATE tbl_category_info SET number = number -1 WHERE id =(SELECT ac.sort_id FROM tbl_article_category ac WHERE ac.article_id = #{artId});")
     int reducecateinfonum(String artId);
-    @Select("UPDATE tbl_category_info SET number = number +1 WHERE id =(SELECT ac.sort_id FROM tbl_article_category ac WHERE ac.article_id = #{artId});")
+    @Update("UPDATE tbl_category_info SET number = number +1 WHERE id =(SELECT ac.sort_id FROM tbl_article_category ac WHERE ac.article_id = #{artId});")
     int pluscateinfonum(String artId);
 }
