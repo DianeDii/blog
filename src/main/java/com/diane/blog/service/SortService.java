@@ -1,7 +1,6 @@
 package com.diane.blog.service;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.diane.blog.model.TblCategoryInfo;
 import org.springframework.stereotype.Service;
 
@@ -12,18 +11,14 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public interface SortService {
-    //crud
+//    分类的crud
     int createSort(TblCategoryInfo categoryInfo);
-
     int delSort(int id);
-//    无调用，先不管
-    int delSort(String categoryName);
-
     JSONArray listSort();
-    //    更新分类名称
     int updateSortName(int sortid,String name);
 
 //   文章分类相关操作(ArticleCategory)
+
 //   将文章加分类
     int addArticleInSort(int sortid, String articleid);
 //   将文章移出分类
@@ -32,5 +27,4 @@ public interface SortService {
     int getArticleSort(String artId);
 //  更新文章的分类信息
     int updateArtSortInfo(int sortid,String articleid);
-
 }

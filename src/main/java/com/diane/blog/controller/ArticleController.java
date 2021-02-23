@@ -51,12 +51,6 @@ public class ArticleController {
     @PostMapping("/init")
     public @ResponseBody
     Apiresponse createArticle(@ApiParam("{'title':1,'summary':1,'content':1}") @RequestBody String data){
-
-//        TblArticleInfo articleInfo = new TblArticleInfo();
-//        TblArticleContent articleContent = new TblArticleContent();
-
-//        解析data并插入article，初始化文章
-//        json数据传入顺序应与数据库表字段顺序相同
         JSONObject newArticle = JSONObject.parseObject(data);
         CreateKeyUtil key = new CreateKeyUtil();
         articleInfo.setId(key.getUUIDKey());
@@ -67,24 +61,17 @@ public class ArticleController {
         articleInfo.setSummary(newArticle.get("summary").toString());
         articleInfo.setTraffic(0);
 
-
         articleContent.setContent(newArticle.get("content").toString());
         articleContent.setCreateBy(new Date());
         articleContent.setModifieldBy(new Date());
 
         if (articleService.submitArticle(articleInfo,articleContent) == 2){
-//            带回一个新建文章的id
             return  Apiresponse.success(articleInfo.getId());
         }else {
             return Apiresponse.fail(API_EXCEPTION);
         }
     }
 
-    /**
-     *
-     * @param artID
-     * @return
-     */
     @ApiOperation("文章删除")
     @ApiResponses(value = {
             @ApiResponse(code = 200,message = "删除成功"),
@@ -168,8 +155,8 @@ public class ArticleController {
             return Apiresponse.success(articleService.listArticleDetail(artID));
         }
     }
+
 //  解决跨域(在util包种编写了CrosFilter拦截器，全局解决，@CrossOrigin注解只能解决单方法)
-//    @CrossOrigin(origins = "*",maxAge = 3600)
     @ApiOperation("展示除.实验室/关于.其他分类的文章")
     @ApiResponses(value = {
             @ApiResponse(code = 200,message = "展示成功"),
@@ -185,6 +172,7 @@ public class ArticleController {
             return Apiresponse.fail(NOT_FOUND);
         }
     }
+
     @ApiOperation("查看某分类下所有文章")
     @ApiResponses(value = {
             @ApiResponse(code = 200,message = "展示成功"),
@@ -199,7 +187,6 @@ public class ArticleController {
             return Apiresponse.fail(NOT_FOUND);
         }
     }
-
 
     @ApiOperation("展示除随笔分类的其他文章(技术博客文章)")
     @ApiResponses(value = {

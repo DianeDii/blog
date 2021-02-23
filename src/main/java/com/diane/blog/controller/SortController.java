@@ -22,7 +22,8 @@ import static com.diane.blog.util.ReturnCode.*;
 @RestController
 public class SortController {
 
-    Byte initNum = 0;
+    final Byte initNum = 0;
+
     @Autowired
     SortService sortService;
 
@@ -50,7 +51,8 @@ public class SortController {
             return Apiresponse.fail(API_EXCEPTION);
         }
     }
-//还可以根据name删，看情况加
+
+
     @ApiOperation("删除分类")
     @ApiResponses(value = {
             @ApiResponse(code = 200,message = "删除成功"),
@@ -69,6 +71,7 @@ public class SortController {
             return Apiresponse.fail(API_EXCEPTION);
         }
     }
+
     @ApiOperation("展示所有分类(不含预设分类)")
     @ApiResponses(value = {
             @ApiResponse(code = 200,message = "展示成功"),

@@ -13,27 +13,21 @@ import org.springframework.stereotype.Service;
 @Service
 public interface ArticleService {
 
-//    暂存
-//    void createArticle(TblArticleContent articleContent);
-
 //    发布博客（update init）
     int submitArticle(TblArticleInfo articleInfo, TblArticleContent articleContent);
-
 //    更新博客
     int updateArticle(TblArticleInfo articleInfo,TblArticleContent articleContent);
 //    删除博客
     int delArticle(String artId);
-//    详情：标题，正文，创建时间
-//    查看博文详情
+//    查看博文详情（标题，正文，创建时间）
     JSONArray listArticleDetail(String artId);
-//    概览 标题，简介
-//    查看所有博文概览
+//    查看所有博文概览(标题，简介)
     String listAllArticle();
-    //    展示某分类所有文章
+//    展示某分类所有文章
     String listAllArticleInSort(int sortid);
-    //    展示除随笔分类的其他文章(技术博客文章)
+//    展示除随笔分类的其他文章(技术博客文章)
     String listAllBlog();
-    //  模糊全局查询
+//    模糊全局查询
     String searchArticleByKeyword(String keyword);
 //    获取最近时间的五篇文章
     String recentArticle();

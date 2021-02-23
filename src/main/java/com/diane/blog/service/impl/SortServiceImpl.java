@@ -16,10 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.diane.blog.util.JsonUtils.listToJsonArray;
-
 import java.util.Date;
 import java.util.List;
+
+import static com.diane.blog.util.JsonUtils.listToJsonArray;
 
 /**
  * @author dianedi
@@ -53,15 +53,15 @@ public class SortServiceImpl implements SortService {
             return categoryInfoMapper.insert(categoryInfo);
         }
     }
-//有个逻辑上的问题，如果分类中有内容，删除分类的话其内容也需要删除
+
 
     /**
+     * 如果分类中有内容，删除分类的话其内容也需要删除
      * 判断sort中是否有文章，若有就删文章，前端需要加提示
+     * 失败会回滚
      * @param id
      * @return
      */
-//    需要回滚
-    // FIXME: 2021/1/19 可能还有问题
     @Transactional(rollbackFor = ServiceException.class)
     @Override
     public int delSort(int id) {
@@ -87,13 +87,6 @@ public class SortServiceImpl implements SortService {
             }
         }
     }
-//  这个再controller中没有调用，就先这样吧
-    @Override
-    public int delSort(String categoryName) {
-        TblCategoryInfoExample categoryInfoExample = new TblCategoryInfoExample();
-        categoryInfoExample.createCriteria().andNameEqualTo(categoryName);
-        return categoryInfoMapper.deleteByExample(categoryInfoExample);
-    }
 
     @Override
     public JSONArray listSort() {
@@ -105,8 +98,6 @@ public class SortServiceImpl implements SortService {
     }
 
 
-
-    //  文章分类相关
 //    增加删除是sortInfo表里也需要同步数量
     @Transactional(rollbackFor = ServiceException.class)
     @Override
@@ -164,7 +155,6 @@ public class SortServiceImpl implements SortService {
                 }else {
                     return -3;//非法！该文章有多条分类信息
                 }
-//            }
         }
     }
 
@@ -194,8 +184,6 @@ public class SortServiceImpl implements SortService {
         info.setName(name);
         int a = categoryInfoMapper.updateByPrimaryKeySelective(info);
         return a;
-
     }
-
 
 }
