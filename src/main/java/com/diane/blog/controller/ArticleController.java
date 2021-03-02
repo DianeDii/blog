@@ -111,24 +111,24 @@ public class ArticleController {
 
 //        解析data并插入article，初始化文章
 //        json数据传入顺序应与数据库表字段顺序相同
-        JSONObject updateData = JSONObject.parseObject(data);
-        System.out.println(new Date());
-        articleInfo.setId(updateData.get("artid").toString());
-        articleInfo.setTitle(updateData.get("title").toString());
+//        JSONObject updateData = JSONObject.parseObject(data);
+//        System.out.println(new Date());
+//        articleInfo.setId(updateData.get("artid").toString());
+//        articleInfo.setTitle(updateData.get("title").toString());
 //        articleInfo.setCreateBy(new Date());
-        articleInfo.setIsTop(false);
-        articleInfo.setModifiedBy(new Date());
-        articleInfo.setSummary(updateData.get("summary").toString());
-        articleInfo.setCreateBy(new Date());
-        articleInfo.setTraffic(0);
+//        articleInfo.setIsTop(false);
+//        articleInfo.setModifiedBy(new Date());
+//        articleInfo.setSummary(updateData.get("summary").toString());
+//        articleInfo.setCreateBy(new Date());
+//        articleInfo.setTraffic(0);
 
 //        文章内容应该不能是string格式的
-        articleContent.setContent(updateData.get("content").toString());
-        articleContent.setArticleId(updateData.get("artid").toString());
+//        articleContent.setContent(updateData.get("content").toString());
+//        articleContent.setArticleId(updateData.get("artid").toString());
 //        articleContent.setCreateBy(new Date());
-        articleContent.setModifieldBy(new Date());
+//        articleContent.setModifieldBy(new Date());
 
-        if (articleService.updateArticle(articleInfo,articleContent) == 2){
+        if (articleService.updateArticle(data) == 2){
             return  Apiresponse.success(SUCCESS);
         }else {
             return Apiresponse.fail(API_EXCEPTION);

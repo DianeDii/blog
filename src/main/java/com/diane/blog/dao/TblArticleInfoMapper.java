@@ -4,8 +4,10 @@ import com.diane.blog.model.TblArticleInfo;
 import com.diane.blog.model.TblArticleInfoExample;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -102,13 +104,18 @@ public interface TblArticleInfoMapper {
     @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id =ac.article_id AND ac.sort_id <>2 AND ac.sort_id <>3 AND traffic =0 ORDER BY modified_by DESC LIMIT 0,5")
     List<TblArticleInfo> rencentArticle();
     //    查询所有文章（除预设分类下）
-    @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id =ac.article_id AND ac.sort_id <>2 AND ac.sort_id <>3 AND traffic =0")
+    @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id =ac.article_id AND ac.sort_id <>2 AND ac.sort_id <>3 AND traffic =0 ORDER BY modified_by DESC")
     List<TblArticleInfo> listArticle();
     //    查询某分类下的所有文章
-    @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id = ac.article_id AND ac.sort_id = #{sortId} AND traffic =0")
+    @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id = ac.article_id AND ac.sort_id = #{sortId} AND traffic =0 ORDER BY modified_by DESC")
     List<TblArticleInfo> listArticleInSort(int sortId);
     //    查询已删除的文章(非sortid = 2/3的分类)
     @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id =ac.article_id AND ac.sort_id <>2 AND ac.sort_id <>3 AND traffic =1")
     List<TblArticleInfo> listDeletedArt();
+
+//    update info and content
+    @Update("UPDATE tbl_article_info SET title = #{title} ,summary = #{summary}, modified_by = #{modified_by} WHERE id = #{infoId};")
+    int updateInfoData(String infoId, String title, String summary, Date modified_by);
+
 
 }

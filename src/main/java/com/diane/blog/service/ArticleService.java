@@ -16,7 +16,7 @@ public interface ArticleService {
 //    发布博客（update init）
     int submitArticle(TblArticleInfo articleInfo, TblArticleContent articleContent);
 //    更新博客
-    int updateArticle(TblArticleInfo articleInfo,TblArticleContent articleContent);
+    int updateArticle(String data);
 //    删除博客
     int delArticle(String artId);
 //    查看博文详情（标题，正文，创建时间）

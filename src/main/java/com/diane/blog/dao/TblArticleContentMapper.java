@@ -2,10 +2,13 @@ package com.diane.blog.dao;
 
 import com.diane.blog.model.TblArticleContent;
 import com.diane.blog.model.TblArticleContentExample;
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.List;
 
 @Component
 public interface TblArticleContentMapper {
@@ -124,4 +127,7 @@ public interface TblArticleContentMapper {
     //  模糊查询文章正文（fulltext）
     @Select("select article_id from tbl_article_content where match(content) against(#{keyword})")
     List<String> selectcontentLikeWord(String keyword);
+
+    @Update("UPDATE tbl_article_content SET content = #{content} , modifield_by = #{modified_by} WHERE article_id = #{infoId};")
+    int updateContentData(String infoId, String content, Date modified_by);
 }
