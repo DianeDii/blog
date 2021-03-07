@@ -24,7 +24,7 @@ public interface SortService {
 //   将文章移出分类
     int delArticleInSort(String articleid);
 //   获取某个文章的分类id
-    int getArticleSort(String artId);
+    String getArticleSort(String artId);
 //  更新文章的分类信息
     int updateArtSortInfo(int sortid,String articleid);
 }

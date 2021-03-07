@@ -106,9 +106,11 @@ public interface TblArticleInfoMapper {
     //    查询所有文章（除预设分类下）
     @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id =ac.article_id AND ac.sort_id <>2 AND ac.sort_id <>3 AND traffic =0 ORDER BY modified_by DESC")
     List<TblArticleInfo> listArticle();
-    //    查询某分类下的所有文章
-    @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id = ac.article_id AND ac.sort_id = #{sortId} AND traffic =0 ORDER BY modified_by DESC")
+    //    查询某分类下的所有文章(+其对应的分类信息)
+    @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac,tbl_category_info ci " +
+            "WHERE ai.id = ac.article_id AND ac.sort_id = ci.id AND ac.sort_id = #{sortId} AND traffic = 0 ORDER BY modified_by DESC")
     List<TblArticleInfo> listArticleInSort(int sortId);
+
     //    查询已删除的文章(非sortid = 2/3的分类)
     @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac WHERE ai.id =ac.article_id AND ac.sort_id <>2 AND ac.sort_id <>3 AND traffic =1")
     List<TblArticleInfo> listDeletedArt();
@@ -116,6 +118,14 @@ public interface TblArticleInfoMapper {
 //    update info and content
     @Update("UPDATE tbl_article_info SET title = #{title} ,summary = #{summary}, modified_by = #{modified_by} WHERE id = #{infoId};")
     int updateInfoData(String infoId, String title, String summary, Date modified_by);
+
+//  查找技术文章
+    @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac,tbl_category_info ci WHERE ai.id = ac.article_id AND ac.sort_id = ci.id AND traffic = 0 AND ac.sort_id >3 ORDER BY modified_by DESC")
+    List<TblArticleInfo> listBlog();
+
+//    根据文章id获取文章所属分类名称
+    @Select("SELECT ci.name FROM tbl_article_category ac, tbl_category_info ci WHERE ac.sort_id = ci.id AND ac.article_id = #{ArtId};")
+    String getSortNameByArtId(String ArtId);
 
 
 }

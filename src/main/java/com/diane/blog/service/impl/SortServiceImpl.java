@@ -140,21 +140,12 @@ public class SortServiceImpl implements SortService {
     }
 
     @Override
-    public int getArticleSort(String artId) {
+    public String getArticleSort(String artId) {
 //        先边界处理，查看有没有这个id
         if (articleInfoMapper.selectByPrimaryKey(artId) == null){
-            return -1;//该文章不存在
+            return null;//该文章不存在
         }else {
-            TblArticleCategoryExample articleCategoryExample = new TblArticleCategoryExample();
-            articleCategoryExample.createCriteria().andArticleIdEqualTo(artId);
-                List<TblArticleCategory> articleCategories= articleCategoryMapper.selectByExample(articleCategoryExample);
-                if (articleCategories.size() ==1){
-                    return articleCategories.get(0).getSortId();
-                }else if(articleCategories.size() ==0){
-                    return -2;//该文章无分类信息
-                }else {
-                    return -3;//非法！该文章有多条分类信息
-                }
+            return articleInfoMapper.getSortNameByArtId(artId);
         }
     }
 

@@ -144,12 +144,8 @@ public class SortController {
     })
     @GetMapping("/{artID}")
     public Apiresponse findArtSort(@PathVariable("artID") String artID){
-        if (sortService.getArticleSort(artID)== -1){
+        if (sortService.getArticleSort(artID)== null){
             return Apiresponse.fail(NOT_FOUND);
-        }else if (sortService.getArticleSort(artID)== -2){
-            return Apiresponse.fail(NOT_FOUND);
-        }else if (sortService.getArticleSort(artID)== -3){
-            return Apiresponse.fail(SQL_DATA_CREATE_EXCEPTION);
         }else {
             return Apiresponse.success(sortService.getArticleSort(artID));
         }

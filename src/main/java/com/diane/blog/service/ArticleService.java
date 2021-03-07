@@ -35,4 +35,5 @@ public interface ArticleService {
     String listdeletedArt();
 //    恢复已删除文章
     int recoveryArt(String artId);
+//    文章加密
 }

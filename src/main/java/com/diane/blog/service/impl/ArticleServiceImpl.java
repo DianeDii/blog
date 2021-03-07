@@ -147,20 +147,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public String listAllBlog() {
-        TblArticleCategoryExample articleCategoryExample = new TblArticleCategoryExample();
-        articleCategoryExample.createCriteria()    //不查预设的三个分类
-                .andSortIdGreaterThanOrEqualTo(4);
-        List<TblArticleCategory> articleCategories = articleCategoryMapper.selectByExample(articleCategoryExample);
-        List<TblArticleInfo> result = new ArrayList<>();
-        for (int i = 0; i < articleCategories.size(); i++) {
-            result.add(articleInfoMapper.selectByPrimaryKey(articleCategories.get(i).getArticleId()));
-        }
-        //去除traffic =1 的数据（已删除的）
-        for (int i = 0; i < result.size(); i++) {
-            if (result.get(i).getTraffic() ==1){
-                result.remove(i);
-            }
-        }
+        List<TblArticleInfo> result = articleInfoMapper.listBlog();
         if (result.size() != 0 && result != null) {
             return JSONObject.toJSONString(result);
         }else {
