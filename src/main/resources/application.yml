@@ -16,5 +16,6 @@ mybatis:
   configuration:
     cache-enabled: false #禁用二级缓存
     local-cache-scope: statement #一级缓存指定为statement级别
+    map-underscore-to-camel-case: true #数据库表字段映射自动转驼峰
   mapper-locations: classpath:/mapper/*.xml
 
