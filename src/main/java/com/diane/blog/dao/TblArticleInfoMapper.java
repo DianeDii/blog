@@ -127,5 +127,7 @@ public interface TblArticleInfoMapper {
     @Select("SELECT ci.name FROM tbl_article_category ac, tbl_category_info ci WHERE ac.sort_id = ci.id AND ac.article_id = #{ArtId};")
     String getSortNameByArtId(String ArtId);
 
-
+//    根据文章id获取istop的信息
+    @Select("SELECT is_top FROM tbl_article_info WHERE id = #{artId};")
+    boolean artIsSecret(String artId);
 }

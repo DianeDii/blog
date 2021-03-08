@@ -12,6 +12,7 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 import static com.diane.blog.util.ReturnCode.*;
@@ -106,27 +107,6 @@ public class ArticleController {
     @PostMapping("/update")
     public @ResponseBody
     Apiresponse updateArticle(@ApiParam("{'title':1,'summary':1,'content':1 ,'artId':1）") @RequestBody String data){
-//        TblArticleInfo articleInfo = new TblArticleInfo();
-//        TblArticleContent articleContent = new TblArticleContent();
-
-//        解析data并插入article，初始化文章
-//        json数据传入顺序应与数据库表字段顺序相同
-//        JSONObject updateData = JSONObject.parseObject(data);
-//        System.out.println(new Date());
-//        articleInfo.setId(updateData.get("artid").toString());
-//        articleInfo.setTitle(updateData.get("title").toString());
-//        articleInfo.setCreateBy(new Date());
-//        articleInfo.setIsTop(false);
-//        articleInfo.setModifiedBy(new Date());
-//        articleInfo.setSummary(updateData.get("summary").toString());
-//        articleInfo.setCreateBy(new Date());
-//        articleInfo.setTraffic(0);
-
-//        文章内容应该不能是string格式的
-//        articleContent.setContent(updateData.get("content").toString());
-//        articleContent.setArticleId(updateData.get("artid").toString());
-//        articleContent.setCreateBy(new Date());
-//        articleContent.setModifieldBy(new Date());
 
         if (articleService.updateArticle(data) == 2){
             return  Apiresponse.success(SUCCESS);
@@ -148,7 +128,7 @@ public class ArticleController {
     })
 //    @CrossOrigin(origins = "*",maxAge = 3600)
     @GetMapping("/{artID}")
-    public Apiresponse ArticleDetail(@ApiParam("文章id") @PathVariable("artID") String artID){
+    public Apiresponse ArticleDetail(@ApiParam("文章id") @PathVariable("artID") String artID) throws UnsupportedEncodingException {
         if (articleService == null){
             return Apiresponse.fail(NOT_FOUND);
         }else{
@@ -262,4 +242,33 @@ public class ArticleController {
             return Apiresponse.success("无文章");
         }
     }
+
+    @ApiOperation("获取文章加密状态")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200,message = "展示成功"),
+            @ApiResponse(code = 404,message = "无文章"),
+            @ApiResponse(code = 500,message = "查询失败")
+    })
+    @GetMapping("/isSecret")
+    public Apiresponse getBlogSecret(@ApiParam("文章id") @RequestParam("artID") String artID){
+        return Apiresponse.success(articleService.isSecret(artID));
+    }
+
+    @ApiOperation("解密文章")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200,message = "解密成功"),
+            @ApiResponse(code = 500,message = "解密失败")
+    })
+    @PostMapping("/decrypt")
+    public @ResponseBody
+    Apiresponse blogDecrypt(@ApiParam("{artId:xx,pwd:xx}") @RequestBody String data){
+        JSONObject datalist = JSONObject.parseObject(data);
+
+        String artid = datalist.get("artId").toString();
+        String pwd = datalist.get("pwd").toString();
+        if (articleService.contentDecrypt(artid,pwd) == null) return Apiresponse.fail();
+        return Apiresponse.success(articleService.contentDecrypt(artid,pwd));
+
+    }
+
 }

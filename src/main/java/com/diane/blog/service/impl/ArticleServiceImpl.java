@@ -6,8 +6,12 @@ import com.diane.blog.dao.TblArticleCategoryMapper;
 import com.diane.blog.dao.TblArticleContentMapper;
 import com.diane.blog.dao.TblArticleInfoMapper;
 import com.diane.blog.dao.TblCategoryInfoMapper;
-import com.diane.blog.model.*;
+import com.diane.blog.model.TblArticleContent;
+import com.diane.blog.model.TblArticleContentExample;
+import com.diane.blog.model.TblArticleInfo;
+import com.diane.blog.model.TblArticleInfoExample;
 import com.diane.blog.service.ArticleService;
+import com.diane.blog.util.AESUtils;
 import com.diane.blog.util.ReturnCode;
 import com.diane.blog.util.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,11 +109,12 @@ public class ArticleServiceImpl implements ArticleService {
                 return 0;
             }
     }
-
+//      d7f8fce260264d8bafc7e0855cd9822e
     @Override
     public JSONArray listArticleDetail(String artId) {
         TblArticleContentExample contentExample = new TblArticleContentExample();
         TblArticleInfo articleInfo = articleInfoMapper.selectByPrimaryKey(artId);
+
 //        根据文章id查询内容表里的文章内容content
             contentExample.createCriteria().andArticleIdEqualTo(artId);
 //      读取text类型的要用selectByExampleWithBLOBs()
@@ -117,7 +122,14 @@ public class ArticleServiceImpl implements ArticleService {
             if (content.size()!= 0){
                 List<String> list = new ArrayList<>();
                 list.add(articleInfo.getTitle());
-                list.add(content.get(0).getContent());
+//                加密content
+
+                if (articleInfo.getIsTop() == true){
+                    String tmp = AESUtils.encrypt(content.get(0).getContent());
+                    list.add(tmp);
+                }else {
+                    list.add(content.get(0).getContent());
+                }
                 list.add(articleInfo.getModifiedBy().toString());
                 list.add(articleInfo.getSummary());
                 return listToJsonArray(list);
@@ -210,5 +222,33 @@ public class ArticleServiceImpl implements ArticleService {
         }else {
             return 0;
         }
+    }
+
+    @Override
+    public boolean isSecret(String artId) {
+//        先判断artId是否存在
+        if (articleInfoMapper.selectByPrimaryKey(artId) != null){
+            return articleInfoMapper.artIsSecret(artId);
+        }else {
+            throw new ServiceException(ReturnCode.NOT_FOUND);
+        }
+    }
+
+    @Override
+    public JSONArray contentDecrypt(String artId, String pwd) {
+        if (pwd.equals(AESUtils.PASSWORD_KEY)){
+            List<String> list = new ArrayList<>();
+            for (int i = 0; i < listArticleDetail(artId).size(); i++) {
+                if (i == 1){
+                    list.add(AESUtils.decrypt(listArticleDetail(artId).get(1).toString()));
+                }else {
+                    list.add(listArticleDetail(artId).get(i).toString());
+                }
+            }
+            return listToJsonArray(list);
+        }else {
+            return null;
+        }
+
     }
 }
