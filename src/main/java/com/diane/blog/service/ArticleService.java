@@ -41,4 +41,8 @@ public interface ArticleService {
     boolean isSecret(String artId);
 //    接收输入的密码和已加密过的博文数据对文章进行解密
     JSONArray contentDecrypt(String artId,String pwd);
+//    将文章设置为加密状态
+    int encrpyArt(String artId);
+//    将文章设置为公开状态
+    int decrpyArt(String artId);
 }

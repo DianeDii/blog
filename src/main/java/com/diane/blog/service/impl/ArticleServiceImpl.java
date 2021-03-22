@@ -12,9 +12,10 @@ import com.diane.blog.model.TblArticleInfo;
 import com.diane.blog.model.TblArticleInfoExample;
 import com.diane.blog.service.ArticleService;
 import com.diane.blog.util.AESUtils;
-import com.diane.blog.util.ReturnCode;
-import com.diane.blog.util.ServiceException;
+import com.diane.blog.config.ReturnCode;
+import com.diane.blog.config.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +43,13 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
     TblCategoryInfoMapper categoryInfoMapper;
-
+    /**
+     * 集成redis话，需要考虑。更新的时候需要在更新后先查看redis有没有这一条的缓存，有就更新reids缓存，
+     * 查询文章详情需要把文章内容存到redis中。
+     * 目前数据都是json，默认的序列化器需要修改，不对，json也是String。就用默认的吧
+     */
+    @Autowired
+    RedisTemplate<String,String> template;
     /**
      * artinfo表需要插入一条数据，同时artcontent也需要插入一条数据，这两条数据要么都插入进去，要么都没插，不能出现info中插入成功而content插入失败的情况。
      * 用事务
@@ -132,6 +139,8 @@ public class ArticleServiceImpl implements ArticleService {
                 }
                 list.add(articleInfo.getModifiedBy().toString());
                 list.add(articleInfo.getSummary());
+
+//                if ()
                 return listToJsonArray(list);
             }else {
                 return null;
@@ -250,5 +259,15 @@ public class ArticleServiceImpl implements ArticleService {
             return null;
         }
 
+    }
+
+    @Override
+    public int encrpyArt(String artId) {
+        return articleInfoMapper.encrpyart(artId);
+    }
+
+    @Override
+    public int decrpyArt(String artId) {
+        return articleInfoMapper.decrpyart(artId);
     }
 }

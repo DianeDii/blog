@@ -1,4 +1,4 @@
-package com.diane.blog.util;
+package com.diane.blog.config;
 
 import lombok.Getter;
 

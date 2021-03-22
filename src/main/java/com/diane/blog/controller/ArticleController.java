@@ -6,7 +6,7 @@ import com.diane.blog.dao.TblArticleInfoMapper;
 import com.diane.blog.model.TblArticleContent;
 import com.diane.blog.model.TblArticleInfo;
 import com.diane.blog.service.ArticleService;
-import com.diane.blog.util.Apiresponse;
+import com.diane.blog.config.Apiresponse;
 import com.diane.blog.util.CreateKeyUtil;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
-import static com.diane.blog.util.ReturnCode.*;
+import static com.diane.blog.config.ReturnCode.*;
 
 /**
  * @author dianedi
@@ -269,6 +269,17 @@ public class ArticleController {
         if (articleService.contentDecrypt(artid,pwd) == null) return Apiresponse.fail();
         return Apiresponse.success(articleService.contentDecrypt(artid,pwd));
 
+    }
+    @ApiOperation("将文章设置为加密状态")
+    @GetMapping("/toSecret")
+    public Apiresponse toSecret(@ApiParam("文章id") @RequestParam("artID") String artID){
+        return Apiresponse.success(articleService.encrpyArt(artID));
+    }
+
+    @ApiOperation("将文章设置为公开状态")
+    @GetMapping("/toPublic")
+    public Apiresponse toPublic(@ApiParam("文章id") @RequestParam("artID") String artID){
+        return Apiresponse.success(articleService.decrpyArt(artID));
     }
 
 }

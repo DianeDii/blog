@@ -1,14 +1,14 @@
 package com.diane.blog.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.diane.blog.util.Apiresponse;
+import com.diane.blog.config.Apiresponse;
 import com.diane.blog.util.TokenUtil;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
 
-import static com.diane.blog.util.ReturnCode.USER_NOT_LOGIN_ERROR;
+import static com.diane.blog.config.ReturnCode.USER_NOT_LOGIN_ERROR;
 
 /**
  * @author dianedi

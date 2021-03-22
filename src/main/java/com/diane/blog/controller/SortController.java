@@ -3,14 +3,14 @@ package com.diane.blog.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.diane.blog.model.TblCategoryInfo;
 import com.diane.blog.service.SortService;
-import com.diane.blog.util.Apiresponse;
+import com.diane.blog.config.Apiresponse;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 
-import static com.diane.blog.util.ReturnCode.*;
+import static com.diane.blog.config.ReturnCode.*;
 
 /**
  * @author dianedi
