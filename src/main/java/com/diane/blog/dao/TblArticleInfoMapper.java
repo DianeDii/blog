@@ -120,14 +120,22 @@ public interface TblArticleInfoMapper {
     int updateInfoData(String infoId, String title, String summary, Date modified_by);
 
 //  查找技术文章
-    @Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac,tbl_category_info ci WHERE ai.id = ac.article_id AND ac.sort_id = ci.id AND traffic = 0 AND ac.sort_id >3 ORDER BY modified_by DESC")
-    List<TblArticleInfo> listBlog();
+@Select("SELECT ai.* FROM tbl_article_info ai,tbl_article_category ac,tbl_category_info ci WHERE ai.id = ac.article_id AND ac.sort_id = ci.id AND traffic = 0 AND ac.sort_id >3 ORDER BY modified_by DESC")
+List<TblArticleInfo> listBlog();
 
-//    根据文章id获取文章所属分类名称
+    //    根据文章id获取文章所属分类名称
     @Select("SELECT ci.name FROM tbl_article_category ac, tbl_category_info ci WHERE ac.sort_id = ci.id AND ac.article_id = #{ArtId};")
     String getSortNameByArtId(String ArtId);
 
-//    根据文章id获取istop的信息
+    //    根据文章id获取istop的信息
     @Select("SELECT is_top FROM tbl_article_info WHERE id = #{artId};")
     boolean artIsSecret(String artId);
+
+
+    //    文章加解密
+    @Update("UPDATE tbl_article_info SET is_top = 1  WHERE id = #{artId}")
+    int encrpyart(String artId);
+
+    @Update("UPDATE tbl_article_info SET is_top = 0  WHERE id = #{artId}")
+    int decrpyart(String artId);
 }

@@ -125,7 +125,8 @@ public interface TblArticleContentMapper {
     int updateByPrimaryKey(TblArticleContent record);
 
     //  模糊查询文章正文（fulltext）
-    @Select("select article_id from tbl_article_content where match(content) against(#{keyword})")
+//    @Select("select article_id from tbl_article_content where match(content) against(#{keyword})")
+    @Select("select ac.article_id from tbl_article_content ac, tbl_article_info ai WHERE ac.article_id = ai.id AND ai.is_top = 0 match(content) against(#{keyword})")
     List<String> selectcontentLikeWord(String keyword);
 
     @Update("UPDATE tbl_article_content SET content = #{content} , modifield_by = #{modified_by} WHERE article_id = #{infoId};")
